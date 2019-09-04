@@ -1,0 +1,19 @@
+
+# Files and directories created by pub
+.packages
+.pub/
+.dart_tool
+.firebase/
+build/
+locale/
+firebase-debug.log
+
+# Functions
+node_modules/
+
+# Remove the following pattern if you wish to check in your lock file
+pubspec.lock
+
+
+# Directory created by dartdoc
+doc/api/
