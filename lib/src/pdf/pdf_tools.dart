@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'dart:io';
 
-outputPdfCard(double width, double height, String outputPath,
+Future outputComponentPdf(double width, double height, String outputPath,
     Widget Function(Context context) cardRenderer) async {
   final _pdf = Document(
     author: 'Deckorator by Jimmy Forrester-Fellowes',

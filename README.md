@@ -1,12 +1,18 @@
 # Deckorator
 
-Tools for creating card games.
+Tools for creating card games & boardgames.
+
+## Usage
+
+import `deckorator.dart` to get all the tools or just import the specific category of tools listed below. 
 
 ## http.dart
 
 Http tools.
 
 ### fetchCsvFromGoogleSpeadsheet
+
+Fetches the CSV output form a google spreadsheet. In order for this to work you need to make sure you have sharing options for the spreadsheet set to 'Anyone with a link can view'.
 
 ```dart
 // import BrowserClient or IoClient as required from package:http
@@ -26,3 +32,11 @@ Creates a `DataTable` representing the data stored in a csv.
 ```dart
 final DataTable data = csvToDataTable(csvString);
 ```
+
+## pdf.dart
+
+PDF related tools.
+
+### outputPdfCard
+
+Outputs a PDF card.
