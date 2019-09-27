@@ -1,2 +1,4 @@
-export 'src/csv/csv_tools.dart';
-export 'src/csv/data_table.dart';
+library decorator.data;
+
+export 'src/data/csv_tools.dart';
+export 'src/data/data_table.dart';

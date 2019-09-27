@@ -2,6 +2,7 @@ import 'data_table.dart';
 
 import 'package:csv/csv.dart';
 
+/// Converts a CSV to a `DataTable` which makes working with it much easier.
 DataTable csvToDataTable(String csv) {
   // parse the csv
   var _csv = const CsvToListConverter(

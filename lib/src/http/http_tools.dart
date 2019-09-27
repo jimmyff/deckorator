@@ -1,5 +1,6 @@
 import 'package:http/http.dart';
 
+/// Fetches the CSV output of a 'Google Sheet' single sheet.
 Future<String> fetchCsvFromGoogleSpeadsheet(
     Client httpClient, String spreadsheetId, String sheetRef) async {
   Response response = await httpClient.get(

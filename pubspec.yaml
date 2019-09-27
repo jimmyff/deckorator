@@ -1,8 +1,8 @@
 name: deckorator
-description: Tools for creating card games
-# version: 1.0.0
-# homepage: https://www.example.com
-# author: Jimmy Forrester-Fellowes <email@example.com>
+description: Tools for creating card games and boardgames.
+version: 1.0.0
+homepage: https://github.com/jimmyff/deckorator
+author: Jimmy Forrester-Fellowes <email@example.com>
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -10,11 +10,10 @@ environment:
 dependencies:
   args: ^1.4.2
   csv: any
-  # deckorator:
-  #   path: ../deckorator
-  pdf: any
+  pdf: ^1.3.22
   image: any
   http: any
+  pool: any
 
 dev_dependencies:
   pedantic: ^1.8.0

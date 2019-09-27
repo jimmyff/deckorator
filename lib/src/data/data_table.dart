@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+/// A convinent way to itterate over and fetch values from a table of data.
 class DataTable extends ListBase<DataTableRow> {
   List<String> keys;
   List<DataTableRow> data;
