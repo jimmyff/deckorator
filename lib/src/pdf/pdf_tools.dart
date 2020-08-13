@@ -111,14 +111,24 @@ Future outputPdfSheet(String outputPath, double width, double height,
                               itemsPerPage: itemsPerPage,
                               page: p,
                               row: row,
+                              // For the back- the cols need to be reversed
                               col: col,
                               colsPerPage: colsPerPage,
                               rowsPerPage: rowsPerPage))
                         Positioned(
                           top: (row * cHeightWithBleed) +
                               ((row + 1) * rowMargin),
-                          left:
-                              (col * cWidthWithBleed) + ((col + 1) * colMargin),
+
+                          // If we're on the back then reverse the column
+                          left: ((side == PageSide.back
+                                      ? colsPerPage - col - 1
+                                      : col) *
+                                  cWidthWithBleed) +
+                              (((side == PageSide.back
+                                          ? colsPerPage - col - 1
+                                          : col) +
+                                      1) *
+                                  colMargin),
                           child: Container(
                             // decoration: BoxDecoration(
                             //     border: BoxBorder(
