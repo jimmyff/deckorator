@@ -26,14 +26,20 @@ Future outputComponentPdf(String outputPath, GameComponent component,
 }
 
 /// Outputs PDF sheets containing the components provided
-Future outputPdfSheet(String outputPath, double width, double height,
-    List<GameComponent> components,
-    {double bleed,
-    bool seperateFiles: false,
-    bool seperateFilesSeperateBacks: true,
-    bool componentOutline: false,
-    double backSheetOffsetTop,
-    double backSheetOffsetLeft}) async {
+Future outputPdfSheet(
+  String outputPath,
+  double width,
+  double height,
+  List<GameComponent> components, {
+  double bleed,
+  bool seperateFiles: false,
+  bool seperateFilesSeperateBacks: true,
+  bool componentOutline: false,
+  double frontSheetOffsetTop,
+  double frontSheetOffsetLeft,
+  double backSheetOffsetTop,
+  double backSheetOffsetLeft,
+}) async {
   final pool = Pool(10);
 
   pool.withResource(() async {
@@ -90,6 +96,12 @@ Future outputPdfSheet(String outputPath, double width, double height,
         print('Adding page $p');
 
         for (var side in [PageSide.front, PageSide.back]) {
+          final double offsetY =
+              side == PageSide.back ? backSheetOffsetTop : frontSheetOffsetTop;
+          final double offsetX = side == PageSide.back
+              ? backSheetOffsetLeft
+              : frontSheetOffsetLeft;
+
           _pdf[seperateFiles ? pagesWithBacks : 0].addPage(Page(
               pageFormat: PdfPageFormat(width, height),
               build: (Context context) {
@@ -102,8 +114,8 @@ Future outputPdfSheet(String outputPath, double width, double height,
                       colCount: colsPerPage,
                       rowMargin: rowMargin,
                       colMargin: colMargin,
-                      offsetTop: 0.0,
-                      offsetLeft: 0.0),
+                      offsetTop: offsetY,
+                      offsetLeft: offsetX),
                   for (var row = 0; row < rowsPerPage; row++)
                     for (var col = 0; col < colsPerPage; col++)
                       if (componentsInGroup.length >
@@ -116,11 +128,13 @@ Future outputPdfSheet(String outputPath, double width, double height,
                               colsPerPage: colsPerPage,
                               rowsPerPage: rowsPerPage))
                         Positioned(
-                          top: (row * cHeightWithBleed) +
+                          top: offsetY +
+                              (row * cHeightWithBleed) +
                               ((row + 1) * rowMargin),
 
                           // If we're on the back then reverse the column
-                          left: ((side == PageSide.back
+                          left: offsetX +
+                              ((side == PageSide.back
                                       ? colsPerPage - col - 1
                                       : col) *
                                   cWidthWithBleed) +
@@ -169,10 +183,12 @@ Future outputPdfSheet(String outputPath, double width, double height,
                     for (var row = 0; row < rowsPerPage; row++)
                       for (var col = 0; col < colsPerPage; col++)
                         Positioned(
-                            top: (row * cHeightWithBleed) +
+                            top: offsetY +
+                                (row * cHeightWithBleed) +
                                 ((row + 1) * rowMargin) +
                                 bleed,
-                            left: (col * cWidthWithBleed) +
+                            left: offsetX +
+                                (col * cWidthWithBleed) +
                                 ((col + 1) * colMargin) +
                                 bleed,
                             child: Container(

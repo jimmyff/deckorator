@@ -41,7 +41,16 @@ class DataTableRow extends ListBase<dynamic> {
   String value(String key) => data[keys.indexOf(key)] == ""
       ? null
       : data[keys.indexOf(key)].toString().trim();
-  int valueAsInt(String key) => data[keys.indexOf(key)] == ""
-      ? null
-      : int.parse(data[keys.indexOf(key)].toString().trim());
+  int valueAsInt(String key) {
+    // TODO: This try catch needs to be generic for this and value
+    try {
+      return data[keys.indexOf(key)] == ""
+          ? null
+          : int.parse(data[keys.indexOf(key)].toString().trim());
+    } catch (e, _) {
+      if (keys.indexOf(key) == -1)
+        throw Exception("No column with key: '$key'");
+      rethrow;
+    }
+  }
 }
