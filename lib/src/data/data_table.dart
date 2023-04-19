@@ -10,11 +10,10 @@ class DataTable extends ListBase<DataTableRow> {
     data.length = newLength;
   }
 
-  DataTable(this.keys, List<List<dynamic>> values) {
-    this.data = values
-        .map<DataTableRow>((List<dynamic> d) => new DataTableRow(keys, d))
-        .toList();
-  }
+  DataTable(this.keys, List<List<dynamic>> values)
+      : data = values
+            .map<DataTableRow>((List<dynamic> d) => new DataTableRow(keys, d))
+            .toList();
 
   DataTableRow operator [](int index) => data[index];
   void operator []=(int index, DataTableRow value) {
@@ -38,10 +37,10 @@ class DataTableRow extends ListBase<dynamic> {
     data[index] = value;
   }
 
-  String value(String key) => data[keys.indexOf(key)] == ""
+  String? value(String key) => data[keys.indexOf(key)] == ""
       ? null
       : data[keys.indexOf(key)].toString().trim();
-  int valueAsInt(String key) {
+  int? valueAsInt(String key) {
     // TODO: This try catch needs to be generic for this and value
     try {
       return data[keys.indexOf(key)] == ""

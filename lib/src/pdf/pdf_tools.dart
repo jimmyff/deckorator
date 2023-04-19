@@ -4,15 +4,17 @@ import 'package:deckorator/src/pdf/cut_lines.dart';
 import 'package:pool/pool.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'game_component.dart';
+import '../game_component.dart';
 
 enum PageSide { front, back }
 
+const decoratorAuthor = 'Deckorator by Jimmy Forrester-Fellowes';
+
 /// Outputs a single pdf files containing the component provided
 Future outputComponentPdf(String outputPath, GameComponent component,
-    {double bleed}) async {
+    {required double bleed}) async {
   final _pdf = Document(
-    author: 'Deckorator by Jimmy Forrester-Fellowes',
+    author: decoratorAuthor,
     compress: true,
     pageMode: PdfPageMode.none,
   );
@@ -22,7 +24,7 @@ Future outputComponentPdf(String outputPath, GameComponent component,
       build: (context) => component.buildFront(context, bleed)));
 
   final file = File(outputPath);
-  await file.writeAsBytes(_pdf.save());
+  await file.writeAsBytes(await _pdf.save());
 }
 
 /// Outputs PDF sheets containing the components provided
@@ -31,21 +33,21 @@ Future outputPdfSheet(
   double width,
   double height,
   List<GameComponent> components, {
-  double bleed,
+  required double bleed,
   bool seperateFiles: false,
   bool seperateFilesSeperateBacks: true,
   bool componentOutline: false,
-  double frontSheetOffsetTop,
-  double frontSheetOffsetLeft,
-  double backSheetOffsetTop,
-  double backSheetOffsetLeft,
+  required double frontSheetOffsetTop,
+  required double frontSheetOffsetLeft,
+  required double backSheetOffsetTop,
+  required double backSheetOffsetLeft,
 }) async {
   final pool = Pool(10);
 
   pool.withResource(() async {
-    final _pdf = [
+    final _pdf = <Document?>[
       Document(
-        author: 'Deckorator by Jimmy Forrester-Fellowes',
+        author: decoratorAuthor,
         compress: true,
         pageMode: PdfPageMode.none,
       )
@@ -63,13 +65,13 @@ Future outputPdfSheet(
     print('Grouped components by size');
 
     for (var sizeGroup in componentsBySize.keys) {
-      List componentsInGroup = componentsBySize[sizeGroup];
-      final cWidthWithoutBleed = componentsBySize[sizeGroup].first.width;
-      final cHeightWithoutBleed = componentsBySize[sizeGroup].first.height;
+      List componentsInGroup = componentsBySize[sizeGroup]!;
+      final cWidthWithoutBleed = componentsBySize[sizeGroup]!.first.width;
+      final cHeightWithoutBleed = componentsBySize[sizeGroup]!.first.height;
       final cWidthWithBleed =
-          componentsBySize[sizeGroup].first.widthWithBleed(bleed);
+          componentsBySize[sizeGroup]!.first.widthWithBleed(bleed);
       final cHeightWithBleed =
-          componentsBySize[sizeGroup].first.heightWithBleed(bleed);
+          componentsBySize[sizeGroup]!.first.heightWithBleed(bleed);
       final colsPerPage = (width / cWidthWithBleed).floor();
       final rowsPerPage = (height / cHeightWithBleed).floor();
 
@@ -102,7 +104,7 @@ Future outputPdfSheet(
               ? backSheetOffsetLeft
               : frontSheetOffsetLeft;
 
-          _pdf[seperateFiles ? pagesWithBacks : 0].addPage(Page(
+          _pdf[seperateFiles ? pagesWithBacks : 0]!.addPage(Page(
               pageFormat: PdfPageFormat(width, height),
               build: (Context context) {
                 return Stack(children: [
@@ -195,12 +197,8 @@ Future outputPdfSheet(
                               width: cWidthWithoutBleed,
                               height: cHeightWithoutBleed,
                               decoration: BoxDecoration(
-                                  border: BoxBorder(
-                                      color: PdfColorCmyk(0, 0, 0, 0.2),
-                                      top: true,
-                                      left: true,
-                                      right: true,
-                                      bottom: true)),
+                                  border: Border.all(
+                                      color: PdfColorCmyk(0, 0, 0, 0.2))),
                             )),
                 ]); // Center
               }));
@@ -209,7 +207,7 @@ Future outputPdfSheet(
             if (seperateFiles && seperateFilesSeperateBacks) {
               pagesWithBacks++;
               _pdf.add(Document(
-                author: 'Deckorator by Jimmy Forrester-Fellowes',
+                author: decoratorAuthor,
                 compress: true,
                 pageMode: PdfPageMode.none,
               ));
@@ -217,7 +215,7 @@ Future outputPdfSheet(
           } else {
             if (p < (pagesInGroup - 1) && seperateFiles) {
               _pdf.add(Document(
-                author: 'Deckorator by Jimmy Forrester-Fellowes',
+                author: decoratorAuthor,
                 compress: true,
                 pageMode: PdfPageMode.none,
               ));
@@ -234,19 +232,19 @@ Future outputPdfSheet(
           ? outputPath.replaceFirst(new RegExp(r'\.pdf'), '_${++f}.pdf')
           : outputPath;
       final file = File(filePath);
-      await file.writeAsBytes(pdfFile.save());
+      await file.writeAsBytes(await pdfFile!.save());
       _pdf[i] = null;
     }
   });
 }
 
 int _componentIdx(
-    {int itemsPerPage,
-    int page,
-    int row,
-    int col,
-    int colsPerPage,
-    int rowsPerPage}) {
+    {required int itemsPerPage,
+    required int page,
+    required int row,
+    required int col,
+    required int colsPerPage,
+    required int rowsPerPage}) {
   var itemsOnPreviousPages = page * itemsPerPage;
   var itemsOnPreviousRows = row * colsPerPage;
   return itemsOnPreviousPages + itemsOnPreviousRows + col;

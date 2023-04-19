@@ -5,11 +5,11 @@ import 'package:image/image.dart';
 /// You must specify either a width and height for the files,
 /// or an aspect ratio to resize by.
 Future resizePngs(
-    {int width,
-    int height,
-    double ratio,
-    List<File> files,
-    Directory output}) async {
+    {required int width,
+    required int height,
+    required double ratio,
+    required List<File> files,
+    required Directory output}) async {
   List<Future> futures = [];
   for (final file in files)
     futures.add(resizePng(
@@ -26,8 +26,12 @@ Future resizePngs(
 /// You must specify either a width and height for the files,
 /// or an aspect ratio to resize by.
 Future resizePng(
-    {int width, int height, double ratio, File file, Directory output}) async {
-  Image image = decodeImage(file.readAsBytesSync());
+    {required int width,
+    required int height,
+    required double ratio,
+    required File file,
+    required Directory output}) async {
+  Image image = decodeImage(file.readAsBytesSync())!;
 
   Image newImg;
   if (ratio != null) {

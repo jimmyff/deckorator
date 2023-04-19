@@ -15,15 +15,15 @@ import 'package:pdf/widgets.dart';
 /// [colMargin] is the space between the columns
 /// [rowMargin] is the space between the rows
 List<Widget> componentCutLineIndicatorsForPage({
-  double componentWidth,
-  double componentHeight,
-  double bleed,
-  int rowCount,
-  int colCount,
-  double rowMargin,
-  double colMargin,
-  double offsetTop,
-  double offsetLeft,
+  required double componentWidth,
+  required double componentHeight,
+  required double bleed,
+  required int rowCount,
+  required int colCount,
+  required double rowMargin,
+  required double colMargin,
+  required double offsetTop,
+  required double offsetLeft,
 }) {
   final componentWidthWithBleed = componentWidth + (bleed * 2);
   final componentHeightWithBleed = componentHeight + (bleed * 2);
@@ -44,7 +44,7 @@ List<Widget> componentCutLineIndicatorsForPage({
               width: colMargin,
               decoration: BoxDecoration(
                   border:
-                      BoxBorder(color: PdfColorCmyk(0, 0, 0, 1), top: true)),
+                      Border(top: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
             )),
 
     // horizontal bottom left cutting marks
@@ -63,7 +63,7 @@ List<Widget> componentCutLineIndicatorsForPage({
               width: colMargin,
               decoration: BoxDecoration(
                   border:
-                      BoxBorder(color: PdfColorCmyk(0, 0, 0, 1), top: true)),
+                      Border(top: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
             )),
 
     // vertical top left cutting marks
@@ -80,8 +80,8 @@ List<Widget> componentCutLineIndicatorsForPage({
             child: Container(
               height: rowMargin,
               decoration: BoxDecoration(
-                  border:
-                      BoxBorder(color: PdfColorCmyk(0, 0, 0, 1), left: true)),
+                  border: Border(
+                      left: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
             )),
 
     // vertical top right cutting marks
@@ -99,8 +99,8 @@ List<Widget> componentCutLineIndicatorsForPage({
             child: Container(
               height: rowMargin,
               decoration: BoxDecoration(
-                  border:
-                      BoxBorder(color: PdfColorCmyk(0, 0, 0, 1), left: true)),
+                  border: Border(
+                      left: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
             )),
   ];
 }
