@@ -11,20 +11,40 @@ enum PageSide { front, back }
 const decoratorAuthor = 'Deckorator by Jimmy Forrester-Fellowes';
 
 /// Outputs a single pdf files containing the component provided
-Future outputComponentPdf(String outputPath, GameComponent component,
-    {required double bleed}) async {
+Future<Document> generateComponentPdf({
+  required GameComponent component,
+  required double bleed,
+}) async {
   final _pdf = Document(
     author: decoratorAuthor,
     compress: true,
     pageMode: PdfPageMode.none,
   );
-
+  final doubleBleed = bleed * 2;
+  print('doubleBleed: $doubleBleed');
+  print('component.size: ${component.size}');
   _pdf.addPage(Page(
-      pageFormat: PdfPageFormat(component.width, component.height),
-      build: (context) => component.buildFront(context, bleed)));
+      pageFormat: PdfPageFormat((component.size.x + doubleBleed) * 12,
+          (component.size.y + doubleBleed) * 12),
+      build: (context) => LayoutBuilder(
+          builder: (context, constraints) => component.frontBuilder(
+              GameComponentUiContext(
+                  pdfContext: context,
+                  constraints: constraints!,
+                  bleed: bleed,
+                  component: component)))));
 
+  return _pdf;
+}
+
+Future writeComponentPdf(String outputPath, GameComponent component,
+    {required double bleed}) async {
   final file = File(outputPath);
-  await file.writeAsBytes(await _pdf.save());
+  await file.writeAsBytes(await (await generateComponentPdf(
+    component: component,
+    bleed: bleed,
+  ))
+      .save());
 }
 
 /// Outputs PDF sheets containing the components provided
@@ -57,7 +77,7 @@ Future outputPdfSheet(
     Map<int, GameComponent> componentsHashMap = {};
     // sort components in to size groups
     for (var c in components) {
-      (componentsBySize['${c.width}x${c.height}'] ??= []).add(c);
+      (componentsBySize['${c.size.x}x${c.size.y}'] ??= []).add(c);
 
       // TODO: This could be replaced with uuid
       componentsHashMap[c.hashCode] = c;
@@ -66,8 +86,8 @@ Future outputPdfSheet(
 
     for (var sizeGroup in componentsBySize.keys) {
       List componentsInGroup = componentsBySize[sizeGroup]!;
-      final cWidthWithoutBleed = componentsBySize[sizeGroup]!.first.width;
-      final cHeightWithoutBleed = componentsBySize[sizeGroup]!.first.height;
+      final cWidthWithoutBleed = componentsBySize[sizeGroup]!.first.size.x;
+      final cHeightWithoutBleed = componentsBySize[sizeGroup]!.first.size.y;
       final cWidthWithBleed =
           componentsBySize[sizeGroup]!.first.widthWithBleed(bleed);
       final cHeightWithBleed =
@@ -104,6 +124,26 @@ Future outputPdfSheet(
               ? backSheetOffsetLeft
               : frontSheetOffsetLeft;
 
+          // calculate the idx of components on the page
+          final componentsIdx = [];
+          for (var row = 0; row < rowsPerPage; row++) {
+            for (var col = 0; col < colsPerPage; col++) {
+              final componentIdx = _componentIdx(
+                  itemsPerPage: itemsPerPage,
+                  page: p,
+                  row: row,
+                  // For the back- the cols need to be reversed
+                  col: col,
+                  colsPerPage: colsPerPage,
+                  rowsPerPage: rowsPerPage);
+
+              if (componentsInGroup.length > componentIdx) {
+                componentsIdx.add(componentIdx);
+              }
+            }
+          }
+          var idx = -1;
+
           _pdf[seperateFiles ? pagesWithBacks : 0]!.addPage(Page(
               pageFormat: PdfPageFormat(width, height),
               build: (Context context) {
@@ -120,15 +160,7 @@ Future outputPdfSheet(
                       offsetLeft: offsetX),
                   for (var row = 0; row < rowsPerPage; row++)
                     for (var col = 0; col < colsPerPage; col++)
-                      if (componentsInGroup.length >
-                          _componentIdx(
-                              itemsPerPage: itemsPerPage,
-                              page: p,
-                              row: row,
-                              // For the back- the cols need to be reversed
-                              col: col,
-                              colsPerPage: colsPerPage,
-                              rowsPerPage: rowsPerPage))
+                      if (componentsInGroup.length > componentsIdx[++idx])
                         Positioned(
                           top: offsetY +
                               (row * cHeightWithBleed) +
@@ -146,39 +178,39 @@ Future outputPdfSheet(
                                       1) *
                                   colMargin),
                           child: Container(
-                            // decoration: BoxDecoration(
-                            //     border: BoxBorder(
-                            //         color: PdfColorCmyk(0, 1, 0, 0),
-                            //         top: true,
-                            //         left: true,
-                            //         right: true,
-                            //         bottom: true)),
-                            width: cWidthWithBleed,
-                            height: cHeightWithBleed,
-                            // child: Transform.rotate(
-                            //   angle: -math.pi / 2,
-                            //   child: Container(
-                            //       child: components[currentComponentIdx++]
-                            //           .buildFront(context, bleed)),
-                            // ),
-                            child: side == PageSide.front
-                                ? components[_componentIdx(
-                                        itemsPerPage: itemsPerPage,
-                                        page: p,
-                                        row: row,
-                                        col: col,
-                                        colsPerPage: colsPerPage,
-                                        rowsPerPage: rowsPerPage)]
-                                    .buildFront(context, bleed)
-                                : components[_componentIdx(
-                                        itemsPerPage: itemsPerPage,
-                                        page: p,
-                                        row: row,
-                                        col: col,
-                                        colsPerPage: colsPerPage,
-                                        rowsPerPage: rowsPerPage)]
-                                    .buildBack(context, bleed),
-                          ),
+                              // decoration: BoxDecoration(
+                              //     border: BoxBorder(
+                              //         color: PdfColorCmyk(0, 1, 0, 0),
+                              //         top: true,
+                              //         left: true,
+                              //         right: true,
+                              //         bottom: true)),
+                              width: cWidthWithBleed,
+                              height: cHeightWithBleed,
+                              // child: Transform.rotate(
+                              //   angle: -math.pi / 2,
+                              //   child: Container(
+                              //       child: components[currentComponentIdx++]
+                              //           .buildFront(context, bleed)),
+                              // ),
+                              child: LayoutBuilder(
+                                builder: (context, constraints) => side ==
+                                        PageSide.front
+                                    ? components[componentsIdx[idx]]
+                                        .frontBuilder(GameComponentUiContext(
+                                            pdfContext: context,
+                                            constraints: constraints!,
+                                            bleed: bleed,
+                                            component:
+                                                components[componentsIdx[idx]]))
+                                    : components[componentsIdx[idx]]
+                                        .backBuilder(GameComponentUiContext(
+                                            pdfContext: context,
+                                            constraints: constraints!,
+                                            bleed: bleed,
+                                            component: components[
+                                                componentsIdx[idx]])),
+                              )),
                         ),
                   // Include the component outline if desired
                   if (componentOutline)

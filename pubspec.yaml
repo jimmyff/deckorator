@@ -1,6 +1,6 @@
 name: deckorator
 description: Tools for creating card games and boardgames.
-version: 1.0.0
+version: 2.0.0
 homepage: https://github.com/jimmyff/deckorator
 
 environment:
