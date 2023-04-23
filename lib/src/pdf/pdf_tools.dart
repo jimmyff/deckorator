@@ -20,14 +20,34 @@ Future<Document> generateComponentPdf({
     compress: true,
     pageMode: PdfPageMode.none,
   );
+  final actualBleed = 2.0;
   final doubleBleed = bleed * 2;
+  final dpi = 12;
   print('doubleBleed: $doubleBleed');
   print('component.size: ${component.size}');
+  _pdf.addPage(Page(
+      pageFormat: PdfPageFormat((component.size.x + doubleBleed) * dpi,
+          (component.size.y + doubleBleed) * dpi),
+      build: (context) => LayoutBuilder(
+          builder: (context, constraints) => Stack(children: [
+                Positioned(
+                    top: (bleed - actualBleed) * dpi,
+                    left: (bleed - actualBleed) * dpi,
+                    right: (bleed - actualBleed) * dpi,
+                    bottom: (bleed - actualBleed) * dpi,
+                    child: component.frontBuilder(GameComponentUiContext(
+                      pdfContext: context,
+                      constraints: constraints!,
+                      bleed: actualBleed,
+                      component: component,
+                    )))
+              ]))));
+
   _pdf.addPage(Page(
       pageFormat: PdfPageFormat((component.size.x + doubleBleed) * 12,
           (component.size.y + doubleBleed) * 12),
       build: (context) => LayoutBuilder(
-          builder: (context, constraints) => component.frontBuilder(
+          builder: (context, constraints) => component.backBuilder(
               GameComponentUiContext(
                   pdfContext: context,
                   constraints: constraints!,
