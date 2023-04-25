@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 // import 'package:pdf
@@ -5,6 +7,7 @@ import 'package:pdf/pdf.dart';
 class GameComponentUiContext {
   final pw.Context pdfContext;
   final pw.BoxConstraints constraints;
+  final Map<String, Uint8List> assets;
 
   final double bleedUnscaled;
 
@@ -29,6 +32,7 @@ class GameComponentUiContext {
 
 */
   GameComponentUiContext({
+    required this.assets,
     required this.pdfContext,
     required this.constraints,
     required double bleed,
@@ -50,10 +54,14 @@ class GameComponent {
   final WidgetBuildFunction frontBuilder;
   final WidgetBuildFunction backBuilder;
 
+  /// List of asset files that are required to be loaded for this component
+  final List<String> assets;
+
   double widthWithBleed(double bleed) => size.x + (bleed * 2);
   double heightWithBleed(double bleed) => size.y + (bleed * 2);
 
   GameComponent({
+    required this.assets,
     required this.size,
     required this.frontBuilder,
     required this.backBuilder,

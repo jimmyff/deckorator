@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:deckorator/src/pdf/cut_lines.dart';
 import 'package:pool/pool.dart';
@@ -14,12 +15,21 @@ const decoratorAuthor = 'Deckorator by Jimmy Forrester-Fellowes';
 Future<Document> generateComponentPdf({
   required GameComponent component,
   required double bleed,
+  required Future<Uint8List> Function(String filename) loadAsset,
 }) async {
+  // load all assets
+  final assetBundle = <String, Uint8List>{};
+  for (var file in component.assets) {
+    final fileData = await loadAsset(file);
+    assetBundle[file] = fileData;
+  }
+
   final _pdf = Document(
     author: decoratorAuthor,
     compress: true,
     pageMode: PdfPageMode.none,
   );
+
   final actualBleed = 2.0;
   final doubleBleed = bleed * 2;
   final dpi = 12;
@@ -36,6 +46,7 @@ Future<Document> generateComponentPdf({
                     right: (bleed - actualBleed) * dpi,
                     bottom: (bleed - actualBleed) * dpi,
                     child: component.frontBuilder(GameComponentUiContext(
+                      assets: assetBundle,
                       pdfContext: context,
                       constraints: constraints!,
                       bleed: actualBleed,
@@ -47,8 +58,10 @@ Future<Document> generateComponentPdf({
       pageFormat: PdfPageFormat((component.size.x + doubleBleed) * 12,
           (component.size.y + doubleBleed) * 12),
       build: (context) => LayoutBuilder(
-          builder: (context, constraints) => component.backBuilder(
-              GameComponentUiContext(
+          builder: (context, constraints) =>
+              component.backBuilder(GameComponentUiContext(
+                  // loadAsset: loadAsset,
+                  assets: assetBundle,
                   pdfContext: context,
                   constraints: constraints!,
                   bleed: bleed,
@@ -57,13 +70,15 @@ Future<Document> generateComponentPdf({
   return _pdf;
 }
 
-Future writeComponentPdf(String outputPath, GameComponent component,
-    {required double bleed}) async {
-  final file = File(outputPath);
+Future writeComponentPdf({
+  required String path,
+  required GameComponent component,
+  required double bleed,
+  required Future<Uint8List> Function(String filename) loadAsset,
+}) async {
+  final file = File(path);
   await file.writeAsBytes(await (await generateComponentPdf(
-    component: component,
-    bleed: bleed,
-  ))
+          component: component, loadAsset: loadAsset, bleed: bleed))
       .save());
 }
 
@@ -73,6 +88,7 @@ Future outputPdfSheet(
   double width,
   double height,
   List<GameComponent> components, {
+  required Future<Uint8List> Function(String filename) loadAsset,
   required double bleed,
   bool seperateFiles: false,
   bool seperateFilesSeperateBacks: true,
@@ -218,6 +234,7 @@ Future outputPdfSheet(
                                         PageSide.front
                                     ? components[componentsIdx[idx]]
                                         .frontBuilder(GameComponentUiContext(
+                                            assets: {},
                                             pdfContext: context,
                                             constraints: constraints!,
                                             bleed: bleed,
@@ -225,6 +242,7 @@ Future outputPdfSheet(
                                                 components[componentsIdx[idx]]))
                                     : components[componentsIdx[idx]]
                                         .backBuilder(GameComponentUiContext(
+                                            assets: {},
                                             pdfContext: context,
                                             constraints: constraints!,
                                             bleed: bleed,
