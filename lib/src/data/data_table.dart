@@ -37,6 +37,10 @@ class DataTableRow extends ListBase<dynamic> {
     data[index] = value;
   }
 
+  bool has(String key) =>
+      keys.contains(key) &&
+      data[keys.indexOf(key)].toString().trim().isNotEmpty;
+
   String? value(String key) => data[keys.indexOf(key)] == ""
       ? null
       : data[keys.indexOf(key)].toString().trim();

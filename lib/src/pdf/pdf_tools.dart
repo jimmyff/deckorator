@@ -14,6 +14,7 @@ const decoratorAuthor = 'Deckorator by Jimmy Forrester-Fellowes';
 
 /// Outputs a single pdf files containing the component provided
 Future<Document> generateComponentPdf({
+  required double dpi,
   required GameTheme theme,
   required GameComponent component,
   required double bleed,
@@ -34,7 +35,6 @@ Future<Document> generateComponentPdf({
 
   final actualBleed = 2.0;
   final doubleBleed = bleed * 2;
-  final dpi = 12;
   print('doubleBleed: $doubleBleed');
   print('component.size: ${component.size}');
   _pdf.addPage(Page(
@@ -83,6 +83,7 @@ Future writeComponentPdf({
 }) async {
   final file = File(path);
   await file.writeAsBytes(await (await generateComponentPdf(
+          dpi: 12,
           theme: theme,
           component: component,
           loadAsset: loadAsset,
@@ -163,7 +164,7 @@ Future<List<Document>> generatePdfSheets({
 
     Size Group $sizeGroup (${componentsInGroup.length} components)
     Will fit: $colsPerPage (cols) x $rowsPerPage (rows)
-    Layout margins:: $colMargin (cols), $rowMargin (rows)
+    Layout margins: $colMargin (cols), $rowMargin (rows)
     Items per page: $itemsPerPage Pages: $pagesInGroup
     
     ''');
@@ -201,9 +202,6 @@ Future<List<Document>> generatePdfSheets({
             }
           }
           print('componentsIdx: $componentsIdx');
-          var idx = -1;
-          print('rowsPerPage: $rowsPerPage');
-          print('colsPerPage: $colsPerPage');
 
           _pdf[seperateFiles ? pagesWithBacks : 0].addPage(Page(
               pageFormat: PdfPageFormat(width * dpi, height * dpi),
@@ -211,9 +209,7 @@ Future<List<Document>> generatePdfSheets({
                 return Stack(children: [
                   for (var row = 0; row < rowsPerPage; row++)
                     for (var col = 0; col < colsPerPage; col++)
-                      if (++idx < componentsIdx.length
-                      // && componentsInGroup.length > idx
-                      )
+                      if ((col + (row * colsPerPage)) < componentsIdx.length)
                         Positioned(
                           top: offsetY +
                               ((row * cHeightWithBleed) * dpi) +
@@ -249,24 +245,26 @@ Future<List<Document>> generatePdfSheets({
                               //           .buildFront(context, bleed)),
                               // ),
                               child: LayoutBuilder(
-                                builder: (context, constraints) =>
-                                    side == PageSide.front
-                                        ? components[0].frontBuilder(
-                                            GameComponentUiContext(
-                                                theme: theme,
-                                                assets: assetBundle,
-                                                pdfContext: context,
-                                                constraints: constraints!,
-                                                bleed: bleed,
-                                                component: components[0]))
-                                        : components[0].backBuilder(
-                                            GameComponentUiContext(
-                                                theme: theme,
-                                                assets: assetBundle,
-                                                pdfContext: context,
-                                                constraints: constraints!,
-                                                bleed: bleed,
-                                                component: components[0])),
+                                builder: (context, constraints) => side ==
+                                        PageSide.front
+                                    ? components[componentsIdx[col + (row * colsPerPage)]!]
+                                        .frontBuilder(GameComponentUiContext(
+                                            theme: theme,
+                                            assets: assetBundle,
+                                            pdfContext: context,
+                                            constraints: constraints!,
+                                            bleed: bleed,
+                                            component: components[componentsIdx[
+                                                col + (row * colsPerPage)]!]))
+                                    : components[0].backBuilder(
+                                        GameComponentUiContext(
+                                            theme: theme,
+                                            assets: assetBundle,
+                                            pdfContext: context,
+                                            constraints: constraints!,
+                                            bleed: bleed,
+                                            component: components[componentsIdx[
+                                                col + (row * colsPerPage)]!])),
                               )),
                         ),
 
