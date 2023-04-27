@@ -1,10 +1,12 @@
 import 'dart:typed_data';
 
+import 'game.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 // import 'package:pdf
 
 class GameComponentUiContext {
+  final GameTheme theme;
   final pw.Context pdfContext;
   final pw.BoxConstraints constraints;
   final Map<String, Uint8List> assets;
@@ -19,6 +21,12 @@ class GameComponentUiContext {
   PdfPoint get size =>
       PdfPoint(component.size.x * scale, component.size.y * scale);
 
+  Uint8List assetData(String key) {
+    if (!assets.containsKey(key))
+      throw Exception('Asset not found with key: $key');
+    return assets[key]!;
+  }
+
   double widthPercent(num v) => size.x * (v / 100);
   double heightPercent(num v) => size.y * (v / 100);
 
@@ -32,6 +40,7 @@ class GameComponentUiContext {
 
 */
   GameComponentUiContext({
+    required this.theme,
     required this.assets,
     required this.pdfContext,
     required this.constraints,

@@ -5,7 +5,21 @@ import 'package:pdf/pdf.dart';
 class Game {
   final Map<String, List<GameComponent>> components;
 
-  Game(this.components);
+  final GameTheme theme;
+
+  Game({required this.theme, required this.components});
+}
+
+class GameTheme {
+  final Map<String, PdfColor> colors;
+
+  PdfColor color(String key) {
+    if (!colors.containsKey(key))
+      throw Exception('Color not found with key: $key');
+    return colors[key]!;
+  }
+
+  GameTheme({required this.colors});
 }
 
 enum cardTypes { bridge, poker, tarot }

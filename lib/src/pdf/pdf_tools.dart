@@ -6,6 +6,7 @@ import 'package:pool/pool.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import '../game_component.dart';
+import '../game.dart';
 
 enum PageSide { front, back }
 
@@ -13,6 +14,7 @@ const decoratorAuthor = 'Deckorator by Jimmy Forrester-Fellowes';
 
 /// Outputs a single pdf files containing the component provided
 Future<Document> generateComponentPdf({
+  required GameTheme theme,
   required GameComponent component,
   required double bleed,
   required Future<Uint8List> Function(String filename) loadAsset,
@@ -46,6 +48,7 @@ Future<Document> generateComponentPdf({
                     right: (bleed - actualBleed) * dpi,
                     bottom: (bleed - actualBleed) * dpi,
                     child: component.frontBuilder(GameComponentUiContext(
+                      theme: theme,
                       assets: assetBundle,
                       pdfContext: context,
                       constraints: constraints!,
@@ -60,6 +63,7 @@ Future<Document> generateComponentPdf({
       build: (context) => LayoutBuilder(
           builder: (context, constraints) =>
               component.backBuilder(GameComponentUiContext(
+                  theme: theme,
                   // loadAsset: loadAsset,
                   assets: assetBundle,
                   pdfContext: context,
@@ -71,6 +75,7 @@ Future<Document> generateComponentPdf({
 }
 
 Future writeComponentPdf({
+  required GameTheme theme,
   required String path,
   required GameComponent component,
   required double bleed,
@@ -78,7 +83,10 @@ Future writeComponentPdf({
 }) async {
   final file = File(path);
   await file.writeAsBytes(await (await generateComponentPdf(
-          component: component, loadAsset: loadAsset, bleed: bleed))
+          theme: theme,
+          component: component,
+          loadAsset: loadAsset,
+          bleed: bleed))
       .save());
 }
 
@@ -87,6 +95,7 @@ Future outputPdfSheet(
   String outputPath,
   double width,
   double height,
+  GameTheme theme,
   List<GameComponent> components, {
   required Future<Uint8List> Function(String filename) loadAsset,
   required double bleed,
@@ -234,6 +243,7 @@ Future outputPdfSheet(
                                         PageSide.front
                                     ? components[componentsIdx[idx]]
                                         .frontBuilder(GameComponentUiContext(
+                                            theme: theme,
                                             assets: {},
                                             pdfContext: context,
                                             constraints: constraints!,
@@ -242,6 +252,7 @@ Future outputPdfSheet(
                                                 components[componentsIdx[idx]]))
                                     : components[componentsIdx[idx]]
                                         .backBuilder(GameComponentUiContext(
+                                            theme: theme,
                                             assets: {},
                                             pdfContext: context,
                                             constraints: constraints!,
