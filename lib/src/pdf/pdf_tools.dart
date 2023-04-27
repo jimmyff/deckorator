@@ -91,14 +91,13 @@ Future writeComponentPdf({
 }
 
 /// Outputs PDF sheets containing the components provided
-Future outputPdfSheet(
-  String outputPath,
-  double width,
-  double height,
-  GameTheme theme,
-  List<GameComponent> components, {
+Future<List<Document>> generatePdfSheets({
+  required double dpi, // 12 = 300 dpi
+  required double width,
+  required double height,
+  required GameTheme theme,
+  required List<GameComponent> components,
   required Future<Uint8List> Function(String filename) loadAsset,
-  required double bleed,
   bool seperateFiles: false,
   bool seperateFilesSeperateBacks: true,
   bool componentOutline: false,
@@ -107,10 +106,12 @@ Future outputPdfSheet(
   required double backSheetOffsetTop,
   required double backSheetOffsetLeft,
 }) async {
+  final bleed = 2.0;
   final pool = Pool(10);
+  final dpi = 8; //12;
 
-  pool.withResource(() async {
-    final _pdf = <Document?>[
+  return await pool.withResource<List<Document>>(() async {
+    final _pdf = <Document>[
       Document(
         author: decoratorAuthor,
         compress: true,
@@ -120,12 +121,21 @@ Future outputPdfSheet(
 
     Map<String, List<GameComponent>> componentsBySize = {};
     Map<int, GameComponent> componentsHashMap = {};
+    final assetBundle = <String, Uint8List>{};
     // sort components in to size groups
     for (var c in components) {
       (componentsBySize['${c.size.x}x${c.size.y}'] ??= []).add(c);
 
       // TODO: This could be replaced with uuid
       componentsHashMap[c.hashCode] = c;
+
+      // TODO: THIS SHOULD BE ONLY ON SHEET
+      for (var file in c.assets) {
+        if (!assetBundle.containsKey(file)) {
+          final fileData = await loadAsset(file);
+          assetBundle[file] = fileData;
+        }
+      }
     }
     print('Grouped components by size');
 
@@ -163,11 +173,14 @@ Future outputPdfSheet(
         print('Adding page $p');
 
         for (var side in [PageSide.front, PageSide.back]) {
-          final double offsetY =
-              side == PageSide.back ? backSheetOffsetTop : frontSheetOffsetTop;
-          final double offsetX = side == PageSide.back
-              ? backSheetOffsetLeft
-              : frontSheetOffsetLeft;
+          final double offsetY = (side == PageSide.back
+                  ? backSheetOffsetTop
+                  : frontSheetOffsetTop) *
+              dpi;
+          final double offsetX = (side == PageSide.back
+                  ? backSheetOffsetLeft
+                  : frontSheetOffsetLeft) *
+              dpi;
 
           // calculate the idx of components on the page
           final componentsIdx = [];
@@ -187,40 +200,37 @@ Future outputPdfSheet(
               }
             }
           }
+          print('componentsIdx: $componentsIdx');
           var idx = -1;
+          print('rowsPerPage: $rowsPerPage');
+          print('colsPerPage: $colsPerPage');
 
-          _pdf[seperateFiles ? pagesWithBacks : 0]!.addPage(Page(
-              pageFormat: PdfPageFormat(width, height),
+          _pdf[seperateFiles ? pagesWithBacks : 0].addPage(Page(
+              pageFormat: PdfPageFormat(width * dpi, height * dpi),
               build: (Context context) {
                 return Stack(children: [
-                  ...componentCutLineIndicatorsForPage(
-                      componentWidth: cWidthWithoutBleed,
-                      componentHeight: cHeightWithoutBleed,
-                      bleed: bleed,
-                      rowCount: rowsPerPage,
-                      colCount: colsPerPage,
-                      rowMargin: rowMargin,
-                      colMargin: colMargin,
-                      offsetTop: offsetY,
-                      offsetLeft: offsetX),
                   for (var row = 0; row < rowsPerPage; row++)
                     for (var col = 0; col < colsPerPage; col++)
-                      if (componentsInGroup.length > componentsIdx[++idx])
+                      if (++idx < componentsIdx.length
+                      // && componentsInGroup.length > idx
+                      )
                         Positioned(
                           top: offsetY +
-                              (row * cHeightWithBleed) +
-                              ((row + 1) * rowMargin),
+                              ((row * cHeightWithBleed) * dpi) +
+                              (((row + 1) * rowMargin) * dpi),
 
                           // If we're on the back then reverse the column
                           left: offsetX +
-                              ((side == PageSide.back
-                                      ? colsPerPage - col - 1
-                                      : col) *
-                                  cWidthWithBleed) +
                               (((side == PageSide.back
                                           ? colsPerPage - col - 1
-                                          : col) +
-                                      1) *
+                                          : col) *
+                                      cWidthWithBleed) *
+                                  dpi) +
+                              ((((side == PageSide.back
+                                              ? colsPerPage - col - 1
+                                              : col) +
+                                          1) *
+                                      dpi) *
                                   colMargin),
                           child: Container(
                               // decoration: BoxDecoration(
@@ -230,8 +240,8 @@ Future outputPdfSheet(
                               //         left: true,
                               //         right: true,
                               //         bottom: true)),
-                              width: cWidthWithBleed,
-                              height: cHeightWithBleed,
+                              width: cWidthWithBleed * dpi,
+                              height: cHeightWithBleed * dpi,
                               // child: Transform.rotate(
                               //   angle: -math.pi / 2,
                               //   child: Container(
@@ -239,28 +249,27 @@ Future outputPdfSheet(
                               //           .buildFront(context, bleed)),
                               // ),
                               child: LayoutBuilder(
-                                builder: (context, constraints) => side ==
-                                        PageSide.front
-                                    ? components[componentsIdx[idx]]
-                                        .frontBuilder(GameComponentUiContext(
-                                            theme: theme,
-                                            assets: {},
-                                            pdfContext: context,
-                                            constraints: constraints!,
-                                            bleed: bleed,
-                                            component:
-                                                components[componentsIdx[idx]]))
-                                    : components[componentsIdx[idx]]
-                                        .backBuilder(GameComponentUiContext(
-                                            theme: theme,
-                                            assets: {},
-                                            pdfContext: context,
-                                            constraints: constraints!,
-                                            bleed: bleed,
-                                            component: components[
-                                                componentsIdx[idx]])),
+                                builder: (context, constraints) =>
+                                    side == PageSide.front
+                                        ? components[0].frontBuilder(
+                                            GameComponentUiContext(
+                                                theme: theme,
+                                                assets: assetBundle,
+                                                pdfContext: context,
+                                                constraints: constraints!,
+                                                bleed: bleed,
+                                                component: components[0]))
+                                        : components[0].backBuilder(
+                                            GameComponentUiContext(
+                                                theme: theme,
+                                                assets: assetBundle,
+                                                pdfContext: context,
+                                                constraints: constraints!,
+                                                bleed: bleed,
+                                                component: components[0])),
                               )),
                         ),
+
                   // Include the component outline if desired
                   if (componentOutline)
                     for (var row = 0; row < rowsPerPage; row++)
@@ -281,6 +290,32 @@ Future outputPdfSheet(
                                   border: Border.all(
                                       color: PdfColorCmyk(0, 0, 0, 0.2))),
                             )),
+
+                  ...componentCutLineIndicatorsForPage(
+                      borderWidth: 1.0 * dpi,
+                      borderColor: PdfColors.white,
+                      componentWidth: cWidthWithoutBleed * dpi,
+                      componentHeight: cHeightWithoutBleed * dpi,
+                      bleed: bleed * dpi,
+                      rowCount: rowsPerPage,
+                      colCount: colsPerPage,
+                      rowMargin: rowMargin * dpi,
+                      colMargin: colMargin * dpi,
+                      offsetTop: offsetY * dpi,
+                      offsetLeft: offsetX * dpi),
+
+                  ...componentCutLineIndicatorsForPage(
+                      borderWidth: 0.2 * dpi,
+                      borderColor: PdfColors.black,
+                      componentWidth: cWidthWithoutBleed * dpi,
+                      componentHeight: cHeightWithoutBleed * dpi,
+                      bleed: bleed * dpi,
+                      rowCount: rowsPerPage,
+                      colCount: colsPerPage,
+                      rowMargin: rowMargin * dpi,
+                      colMargin: colMargin * dpi,
+                      offsetTop: offsetY * dpi,
+                      offsetLeft: offsetX * dpi),
                 ]); // Center
               }));
 
@@ -306,16 +341,19 @@ Future outputPdfSheet(
         }
       }
     }
-    var f = 0;
-    for (var i = 0; i < _pdf.length; i++) {
-      final pdfFile = _pdf[i];
-      var filePath = seperateFiles
-          ? outputPath.replaceFirst(new RegExp(r'\.pdf'), '_${++f}.pdf')
-          : outputPath;
-      final file = File(filePath);
-      await file.writeAsBytes(await pdfFile!.save());
-      _pdf[i] = null;
-    }
+
+    return _pdf;
+
+    // var f = 0;
+    // for (var i = 0; i < _pdf.length; i++) {
+    //   final pdfFile = _pdf[i];
+    //   var filePath = seperateFiles
+    //       ? outputPath.replaceFirst(new RegExp(r'\.pdf'), '_${++f}.pdf')
+    //       : outputPath;
+    //   final file = File(filePath);
+    //   await file.writeAsBytes(await pdfFile!.save());
+    //   _pdf[i] = null;
+    // }
   });
 }
 

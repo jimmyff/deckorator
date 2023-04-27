@@ -24,9 +24,13 @@ List<Widget> componentCutLineIndicatorsForPage({
   required double colMargin,
   required double offsetTop,
   required double offsetLeft,
+  required double borderWidth,
+  required PdfColor borderColor,
 }) {
   final componentWidthWithBleed = componentWidth + (bleed * 2);
   final componentHeightWithBleed = componentHeight + (bleed * 2);
+  print(
+      'Generating cut lines for page: offsetTop:$offsetTop rowCount:$rowCount colCount:$colCount');
 
   return [
     // horizontal top left cutting marks
@@ -39,12 +43,13 @@ List<Widget> componentCutLineIndicatorsForPage({
                 bleed,
             left: offsetLeft +
                 (col * componentWidthWithBleed) +
-                ((col) * colMargin),
+                ((col) * colMargin) -
+                (bleed * .6),
             child: Container(
-              width: colMargin,
+              width: colMargin + (bleed * 1.2),
               decoration: BoxDecoration(
-                  border:
-                      Border(top: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
+                  border: Border(
+                      top: BorderSide(width: borderWidth, color: borderColor))),
             )),
 
     // horizontal bottom left cutting marks
@@ -58,12 +63,13 @@ List<Widget> componentCutLineIndicatorsForPage({
                 bleed,
             left: offsetLeft +
                 (col * componentWidthWithBleed) +
-                ((col) * colMargin),
+                ((col) * colMargin) -
+                (bleed * .6),
             child: Container(
-              width: colMargin,
+              width: colMargin + (bleed * 1.2),
               decoration: BoxDecoration(
-                  border:
-                      Border(top: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
+                  border: Border(
+                      top: BorderSide(width: borderWidth, color: borderColor))),
             )),
 
     // vertical top left cutting marks
@@ -73,15 +79,17 @@ List<Widget> componentCutLineIndicatorsForPage({
             top: offsetTop +
                 (row * componentHeightWithBleed) +
                 ((row + 1) * rowMargin) -
-                rowMargin,
+                rowMargin -
+                (bleed * .6),
             left: offsetLeft +
                 ((col * componentWidthWithBleed) + ((col + 1) * colMargin)) +
                 bleed,
             child: Container(
-              height: rowMargin,
+              height: rowMargin + (bleed * 1.2),
               decoration: BoxDecoration(
                   border: Border(
-                      left: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
+                      left:
+                          BorderSide(width: borderWidth, color: borderColor))),
             )),
 
     // vertical top right cutting marks
@@ -91,16 +99,18 @@ List<Widget> componentCutLineIndicatorsForPage({
             top: offsetTop +
                 (row * componentHeightWithBleed) +
                 ((row + 1) * rowMargin) -
-                rowMargin,
+                rowMargin -
+                (bleed * .6),
             left: offsetLeft +
                 ((col * componentWidthWithBleed) + ((col + 1) * colMargin)) +
                 componentWidthWithBleed -
                 bleed,
             child: Container(
-              height: rowMargin,
+              height: rowMargin + (bleed * 1.2),
               decoration: BoxDecoration(
                   border: Border(
-                      left: BorderSide(color: PdfColorCmyk(0, 0, 0, 1)))),
+                      left:
+                          BorderSide(width: borderWidth, color: borderColor))),
             )),
   ];
 }
