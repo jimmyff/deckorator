@@ -5,6 +5,9 @@ import 'package:pdf/pdf.dart';
 class Game {
   final Map<String, List<GameComponent>> components;
 
+  List<GameComponent> get allComponents =>
+      components.values.fold(<GameComponent>[], (all, sub) => all..addAll(sub));
+
   final GameTheme theme;
 
   Game({required this.theme, required this.components});

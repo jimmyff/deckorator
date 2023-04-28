@@ -245,8 +245,7 @@ Future<List<Document>> generatePdfSheets({
                               //           .buildFront(context, bleed)),
                               // ),
                               child: LayoutBuilder(
-                                builder: (context, constraints) => side ==
-                                        PageSide.front
+                                builder: (context, constraints) => side == PageSide.front
                                     ? components[componentsIdx[col + (row * colsPerPage)]!]
                                         .frontBuilder(GameComponentUiContext(
                                             theme: theme,
@@ -256,8 +255,8 @@ Future<List<Document>> generatePdfSheets({
                                             bleed: bleed,
                                             component: components[componentsIdx[
                                                 col + (row * colsPerPage)]!]))
-                                    : components[0].backBuilder(
-                                        GameComponentUiContext(
+                                    : components[componentsIdx[col + (row * colsPerPage)]!]
+                                        .backBuilder(GameComponentUiContext(
                                             theme: theme,
                                             assets: assetBundle,
                                             pdfContext: context,
@@ -290,30 +289,32 @@ Future<List<Document>> generatePdfSheets({
                             )),
 
                   ...componentCutLineIndicatorsForPage(
-                      borderWidth: 1.0 * dpi,
-                      borderColor: PdfColors.white,
-                      componentWidth: cWidthWithoutBleed * dpi,
-                      componentHeight: cHeightWithoutBleed * dpi,
-                      bleed: bleed * dpi,
-                      rowCount: rowsPerPage,
-                      colCount: colsPerPage,
-                      rowMargin: rowMargin * dpi,
-                      colMargin: colMargin * dpi,
-                      offsetTop: offsetY * dpi,
-                      offsetLeft: offsetX * dpi),
+                    borderWidth: 1.0 * dpi,
+                    borderColor: PdfColors.white,
+                    componentWidth: cWidthWithoutBleed * dpi,
+                    componentHeight: cHeightWithoutBleed * dpi,
+                    bleed: bleed * dpi,
+                    rowCount: rowsPerPage,
+                    colCount: colsPerPage,
+                    rowMargin: rowMargin * dpi,
+                    colMargin: colMargin * dpi,
+                    offsetTop: offsetY,
+                    offsetLeft: offsetX,
+                  ),
 
                   ...componentCutLineIndicatorsForPage(
-                      borderWidth: 0.2 * dpi,
-                      borderColor: PdfColors.black,
-                      componentWidth: cWidthWithoutBleed * dpi,
-                      componentHeight: cHeightWithoutBleed * dpi,
-                      bleed: bleed * dpi,
-                      rowCount: rowsPerPage,
-                      colCount: colsPerPage,
-                      rowMargin: rowMargin * dpi,
-                      colMargin: colMargin * dpi,
-                      offsetTop: offsetY * dpi,
-                      offsetLeft: offsetX * dpi),
+                    borderWidth: 0.2 * dpi,
+                    borderColor: PdfColors.black,
+                    componentWidth: cWidthWithoutBleed * dpi,
+                    componentHeight: cHeightWithoutBleed * dpi,
+                    bleed: bleed * dpi,
+                    rowCount: rowsPerPage,
+                    colCount: colsPerPage,
+                    rowMargin: rowMargin * dpi,
+                    colMargin: colMargin * dpi,
+                    offsetTop: offsetY,
+                    offsetLeft: offsetX,
+                  ),
                 ]); // Center
               }));
 
