@@ -58,19 +58,23 @@ Future<Document> generateComponentPdf({
               ]))));
 
   _pdf.addPage(Page(
-      pageFormat: PdfPageFormat((component.size.x + doubleBleed) * 12,
-          (component.size.y + doubleBleed) * 12),
+      pageFormat: PdfPageFormat((component.size.x + doubleBleed) * dpi,
+          (component.size.y + doubleBleed) * dpi),
       build: (context) => LayoutBuilder(
-          builder: (context, constraints) =>
-              component.backBuilder(GameComponentUiContext(
-                  theme: theme,
-                  // loadAsset: loadAsset,
-                  assets: assetBundle,
-                  pdfContext: context,
-                  constraints: constraints!,
-                  bleed: bleed,
-                  component: component)))));
-
+          builder: (context, constraints) => Stack(children: [
+                Positioned(
+                    top: (bleed - actualBleed) * dpi,
+                    left: (bleed - actualBleed) * dpi,
+                    right: (bleed - actualBleed) * dpi,
+                    bottom: (bleed - actualBleed) * dpi,
+                    child: component.backBuilder(GameComponentUiContext(
+                        theme: theme,
+                        assets: assetBundle,
+                        pdfContext: context,
+                        constraints: constraints!,
+                        bleed: actualBleed,
+                        component: component)))
+              ]))));
   return _pdf;
 }
 
@@ -106,10 +110,11 @@ Future<List<Document>> generatePdfSheets({
   required double frontSheetOffsetLeft,
   required double backSheetOffsetTop,
   required double backSheetOffsetLeft,
+  double bleed = 2.0,
 }) async {
-  final bleed = 2.0;
   final pool = Pool(10);
-  final dpi = 8; //12;
+
+  final hiddenComponentBleed = 2.0;
 
   return await pool.withResource<List<Document>>(() async {
     final _pdf = <Document>[
@@ -148,6 +153,14 @@ Future<List<Document>> generatePdfSheets({
           componentsBySize[sizeGroup]!.first.widthWithBleed(bleed);
       final cHeightWithBleed =
           componentsBySize[sizeGroup]!.first.heightWithBleed(bleed);
+
+      final cWidthWithHiddenComponentBleed = componentsBySize[sizeGroup]!
+          .first
+          .widthWithBleed(hiddenComponentBleed);
+      final cHeightWithComponentBleed = componentsBySize[sizeGroup]!
+          .first
+          .heightWithBleed(hiddenComponentBleed);
+
       final colsPerPage = (width / cWidthWithBleed).floor();
       final rowsPerPage = (height / cHeightWithBleed).floor();
 
@@ -245,26 +258,46 @@ Future<List<Document>> generatePdfSheets({
                               //           .buildFront(context, bleed)),
                               // ),
                               child: LayoutBuilder(
-                                builder: (context, constraints) => side == PageSide.front
-                                    ? components[componentsIdx[col + (row * colsPerPage)]!]
-                                        .frontBuilder(GameComponentUiContext(
-                                            theme: theme,
-                                            assets: assetBundle,
-                                            pdfContext: context,
-                                            constraints: constraints!,
-                                            bleed: bleed,
-                                            component: components[componentsIdx[
-                                                col + (row * colsPerPage)]!]))
-                                    : components[componentsIdx[col + (row * colsPerPage)]!]
-                                        .backBuilder(GameComponentUiContext(
-                                            theme: theme,
-                                            assets: assetBundle,
-                                            pdfContext: context,
-                                            constraints: constraints!,
-                                            bleed: bleed,
-                                            component: components[componentsIdx[
-                                                col + (row * colsPerPage)]!])),
-                              )),
+                                  builder: (context, constraints) =>
+                                      Stack(children: [
+                                        Positioned(
+                                          top: (bleed - hiddenComponentBleed) *
+                                              dpi,
+                                          left: (bleed - hiddenComponentBleed) *
+                                              dpi,
+                                          right:
+                                              (bleed - hiddenComponentBleed) *
+                                                  dpi,
+                                          bottom:
+                                              (bleed - hiddenComponentBleed) *
+                                                  dpi,
+                                          child: side == PageSide.front
+                                              ? components[componentsIdx[col + (row * colsPerPage)]!]
+                                                  .frontBuilder(GameComponentUiContext(
+                                                      theme: theme,
+                                                      assets: assetBundle,
+                                                      pdfContext: context,
+                                                      constraints: constraints!,
+                                                      bleed:
+                                                          hiddenComponentBleed,
+                                                      component: components[
+                                                          componentsIdx[col +
+                                                              (row *
+                                                                  colsPerPage)]!]))
+                                              : components[componentsIdx[col + (row * colsPerPage)]!]
+                                                  .backBuilder(GameComponentUiContext(
+                                                      theme: theme,
+                                                      assets: assetBundle,
+                                                      pdfContext: context,
+                                                      constraints: constraints!,
+                                                      bleed:
+                                                          hiddenComponentBleed,
+                                                      component: components[
+                                                          componentsIdx[col +
+                                                              (row *
+                                                                  colsPerPage)]!])),
+                                        )
+                                      ]))),
                         ),
 
                   // Include the component outline if desired
