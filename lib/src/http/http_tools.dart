@@ -5,7 +5,7 @@ Future<String> fetchCsvFromGoogleSpeadsheet(
     Client httpClient, String spreadsheetId, String sheetRef) async {
   final uri = Uri.parse(
       "https://docs.google.com/spreadsheets/d/$spreadsheetId" +
-          "/gviz/tq?tqx=out:csv&sheet=$sheetRef");
+          "/gviz/tq?tqx=out:csv&headers=0&sheet=$sheetRef");
 
   print(uri);
   Response response = await httpClient.get(uri);

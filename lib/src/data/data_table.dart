@@ -41,9 +41,17 @@ class DataTableRow extends ListBase<dynamic> {
       keys.contains(key) &&
       data[keys.indexOf(key)].toString().trim().isNotEmpty;
 
-  String? value(String key) => data[keys.indexOf(key)] == ""
-      ? null
-      : data[keys.indexOf(key)].toString().trim();
+  String? value(String key) {
+    final index = keys.indexOf(key);
+    if (index == -1) throw RangeError('Key "$key" not found $keys');
+    try {
+      return data[index] == "" ? null : data[index].toString().trim();
+    } catch (e, s) {
+      throw RangeError(
+          'Data not found for "$key" with index $index. Row length: ${data.length} $data');
+    }
+  }
+
   int? valueAsInt(String key) {
     // TODO: This try catch needs to be generic for this and value
     try {
