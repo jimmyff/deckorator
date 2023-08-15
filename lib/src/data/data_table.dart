@@ -12,7 +12,7 @@ class DataTable extends ListBase<DataTableRow> {
 
   DataTable(this.keys, List<List<dynamic>> values)
       : data = values
-            .map<DataTableRow>((List<dynamic> d) => new DataTableRow(keys, d))
+            .map<DataTableRow>((List<dynamic> d) => DataTableRow(keys, d))
             .toList();
 
   DataTableRow operator [](int index) => data[index];
@@ -46,7 +46,7 @@ class DataTableRow extends ListBase<dynamic> {
     if (index == -1) throw RangeError('Key "$key" not found $keys');
     try {
       return data[index] == "" ? null : data[index].toString().trim();
-    } catch (e, s) {
+    } catch (e, _) {
       throw RangeError(
           'Data not found for "$key" with index $index. Row length: ${data.length} $data');
     }

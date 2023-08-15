@@ -6,11 +6,10 @@ import 'package:csv/csv.dart';
 DataTable csvToDataTable(String csv) {
   print(csv);
   // parse the csv
-  var _csv = const CsvToListConverter(
-          fieldDelimiter: ',', eol: '\n', shouldParseNumbers: false)
-      .convert(csv);
+  var _csv =
+      const CsvToListConverter(fieldDelimiter: ',', shouldParseNumbers: false)
+          .convert(csv);
 
   List<String> _keys = _csv.removeAt(0).cast<String>();
-
-  return new DataTable(_keys, _csv);
+  return DataTable(_keys, _csv);
 }

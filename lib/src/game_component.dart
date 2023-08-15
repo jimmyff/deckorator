@@ -23,7 +23,8 @@ class GameComponentUiContext {
 
   Uint8List assetData(String key) {
     if (!assets.containsKey(key))
-      throw Exception('Asset not found with key: $key');
+      throw Exception(
+          'Asset not found with key: $key. Did you declare it in the GameComponent asset array?');
     return assets[key]!;
   }
 
