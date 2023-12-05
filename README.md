@@ -1,8 +1,14 @@
 # Deckorator
 
-Tools for creating card games & board games. This is intended to be used by a developer.
+Tools for creating card games games. This is intended to be used by a developer.
 
-## Usage
+The deckorator packages allow you to rapidly develop your card layouts which can be output as Flutter widgets for use digitally or as PDFs. It ships with an small subset of layout functions allowing you to utilise assets, fonts, masking etc.
+
+This package is undergoing a major rework. It is not production ready!
+
+---
+
+## Usage (legacy information)
 
 import `deckorator.dart` to get all the tools or just import the specific category of tools listed below.
 
@@ -32,34 +38,3 @@ Creates a `DataTable` representing the data stored in a csv.
 ```dart
 final DataTable data = csvToDataTable(csvString);
 ```
-
-## package:deckorator/pdf.dart
-
-PDF related tools.
-
-### outputPdfSheet(...)
-
-Outputs a sheet of PDF components. Provide it with the sheet size, a list of `GameComponent` and it will lay the components out. You can also provide optional parameters for:
-
- 1. `bleed` : bleed for artwork
- 1. `seperateFiles` : Each page of components will be seperate PDFs
- 1. `seperateFilesSeperateBacks` : If using `seperateFiles` you can have front and back in same file by setting this to false.
- 1. `componentOutline` will outline your components for cutting. Note this is only advised if creating a rough draft. If using for production just leave the default cut lines on which will not enter the bleed.
- 1. `backSheetOffsetVertical` Useful for duplex printing, if the reverse side of the print has a vertical offset set that here.
- 1. `backSheetOffsetHorizontal` Useful for duplex printing, if the reverse side of the print has a horizontal offset set that here.
-
-### outputPdfCard(...)
-
-Outputs a PDF card.
-
-## package:deckorator/image.dart
-
-Image processing related tools.
-
-### resizePng(...)
-
-Resizes a single PNG file
-
-### resizePngs(...)
-
-Resizes numerous PNG files.
