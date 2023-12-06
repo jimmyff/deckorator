@@ -1,8 +1,9 @@
+import 'dart:typed_data';
 import 'package:deckorator/deckorator.dart';
 import 'package:flutter/widgets.dart';
 
 class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
-  get defaultTextSize => 5;
+  get defaultTextSize => 5.0;
   get defaultTextColor => Color.fromRGBO(0, 0, 0, 1.0);
 
   Widget text(String text, {Color? color, double? size}) => Text(
@@ -33,6 +34,35 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
         children: List<Widget>.from(children),
       );
 
+  Widget image({
+    required String assetPath,
+    bool? showDebug,
+  }) {
+    return Container(
+        decoration: BoxDecoration(
+            border: !(showDebug ?? debugEnabled)
+                ? null
+                : Border.all(
+                    color: Color.fromRGBO(229, 255, 0, 1),
+                    style: BorderStyle.solid,
+                    strokeAlign: BorderSide.strokeAlignInside)),
+        child: FutureBuilder<Uint8List>(
+            future: assets.load(assetPath, log: log),
+            builder: (context, snapshot) => snapshot.hasData
+                ? Image.memory(
+                    snapshot.data!,
+                    fit: BoxFit.fill,
+                  )
+                : Container(
+                    color: snapshot.hasError
+                        ? colorHex('#9A114F')
+                        : colorHex('#000000'),
+                    child: text(
+                        '${snapshot.hasError ? snapshot.error : 'Loading'}',
+                        color: colorHex('#ffffff')),
+                  )));
+  }
+
   Widget positioned({
     double? top,
     double? right,
@@ -57,7 +87,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                       : Border.all(
                           color: Color.fromRGBO(0, 255, 0, 1.0),
                           style: BorderStyle.solid,
-                          strokeAlign: BorderSide.strokeAlignOutside)),
+                          strokeAlign: BorderSide.strokeAlignInside)),
               child: child));
 
   Widget container({

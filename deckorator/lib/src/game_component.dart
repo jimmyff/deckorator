@@ -2,8 +2,8 @@ import 'dart:typed_data';
 import 'package:logging/logging.dart';
 import 'geometry.dart';
 import 'renderer.dart';
-import 'game.dart';
 import 'theme.dart';
+import 'ui.dart';
 
 class GameComponentUiContext {
   final Logger log;
@@ -86,43 +86,6 @@ class GameComponentUiContext {
 }
 
 // typedef pw.Widget WidgetBuildFunction(GameComponentUiContext context);
-
-abstract class UiTools<dWidget, dColor, dEdgeInsets> {
-  bool debugEnabled = false;
-  GameDpi dpi = GameDpi(dpi: 70);
-
-  dWidget text(String text, {dColor? color, double? size});
-  dWidget container({
-    bool? showDebug,
-    GameComponentPoint? size,
-    dWidget? child,
-    dColor? color,
-    dEdgeInsets? padding,
-    dEdgeInsets? margin,
-  });
-  dWidget stack({
-    required List<dWidget> children,
-  });
-  dWidget positioned({
-    double? top,
-    double? right,
-    double? bottom,
-    double? left,
-    double? height,
-    double? width,
-    required dWidget child,
-    bool? showDebug,
-  });
-  dColor colorHex(String hex);
-  dEdgeInsets edgeInset({
-    double left = 0.0,
-    double right = 0.0,
-    double top = 0.0,
-    double bottom = 0.0,
-  });
-
-  List<dWidget> componentDebugOverlay(GameComponentUiContext ctx);
-}
 
 /// Collection of components of the same type (Monster, Equipment, Class etc)
 class GameComponentType {

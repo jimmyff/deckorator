@@ -1,10 +1,9 @@
-import 'dart:typed_data';
-
 import 'package:logging/logging.dart';
-
 import 'game_component.dart';
 import 'theme.dart';
 import 'renderer.dart';
+import 'ui.dart';
+import 'assets.dart';
 
 // A generic game
 class Game {
@@ -29,6 +28,7 @@ class Game {
   renderComponentFront({
     required Logger log,
     required UiTools ui,
+    required AssetLoader assets,
     required GameComponent component,
     bool showDebug = false,
     double bleed = 0.0,
@@ -38,7 +38,7 @@ class Game {
     final componentType =
         components.values.firstWhere((ct) => ct.components.contains(component));
 
-    final assets = <String>{
+    final assetsPaths = <String>{
       ...assetsCore,
       ...componentType.assets,
       ...component.assets
@@ -47,12 +47,14 @@ class Game {
     final context = GameComponentUiContext(
       log: log,
       ui: ui
+        ..assets = assets
         ..debugEnabled = showDebug
-        ..dpi = GameDpi(dpi: dpi),
+        ..dpi = GameDpi(dpi: dpi)
+        ..log = log,
 
       theme: theme,
       // resolution: resolution,
-      assets: assets,
+      assets: assetsPaths,
       // constraints: displayConstraints,
       dpi: GameDpi(dpi: dpi),
       bleed: bleed,
