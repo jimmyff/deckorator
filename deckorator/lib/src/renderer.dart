@@ -2,7 +2,7 @@ import 'game.dart';
 import 'game_component.dart';
 
 abstract class GameComponentRenderer<dWidget> {
-  List<dWidget> frontBuilder(
+  Future<List<dWidget>> frontBuilder(
       {required GameComponentUiContext ctx, bool showDebug = false});
   List<dWidget> backBuilder(GameComponentUiContext context);
 }

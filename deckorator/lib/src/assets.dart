@@ -34,7 +34,8 @@ abstract class AssetLoader {
       final removed = assetPoolKeys.removeLast();
       assetPool.remove(removed);
     }
-    log?.fine('Asset added to pool, size: ${assetPool.length}');
+    log?.fine('Asset added to pool, size: ${assetPool.length}: $path');
+    // log?.fine('Asset pool: ${assetPool.keys}');
     return data;
   }
 }

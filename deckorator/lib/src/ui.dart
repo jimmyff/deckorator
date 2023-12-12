@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:logging/logging.dart';
 
 import 'game.dart';
@@ -37,6 +38,19 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
 
   dWidget image({
     required String assetPath,
+    bool? showDebug,
+  });
+
+  dWidget imageFromBytes({
+    required Uint8List bytes,
+    bool? showDebug,
+  });
+
+  dWidget mask({
+    required String assetPath,
+    required String assetPathMask,
+    dColor? maskColor,
+    dWidget? child,
     bool? showDebug,
   });
   dColor colorHex(String hex);

@@ -4,6 +4,8 @@ import 'geometry.dart';
 import 'renderer.dart';
 import 'theme.dart';
 import 'ui.dart';
+import 'assets.dart';
+import 'images.dart';
 
 class GameComponentUiContext {
   final Logger log;
@@ -13,7 +15,11 @@ class GameComponentUiContext {
 
   final GameTheme theme;
 
-  final Set<String> assets;
+  // final Set<String> assets;
+
+  Future<Uint8List> buildAsset(String assetKey) async {
+    return await componentType.buildAssets[assetKey]!(this, ImageTools());
+  }
 
   final double bleed;
 
@@ -40,6 +46,10 @@ class GameComponentUiContext {
   //   return assets[key]!;
   // }
 
+  T data<T>(String key) => component.data.containsKey(key)
+      ? component.data[key]!
+      : componentType.data[key];
+
   // double widthPercent(num v) => percentageOfWidth(v) * dpi;
   // double heightPercent(num v) => percentageOfHeight(v) * dpi;
 
@@ -62,7 +72,7 @@ class GameComponentUiContext {
     required this.log,
     required this.ui,
     required this.theme,
-    required this.assets,
+    // required this.assets,
     // required this.resolution,
     // required this.pdfContext,
     // required this.constraints,
@@ -94,14 +104,22 @@ class GameComponentType {
   /// Default size for this component type
   final GameComponentPoint size;
 
+  final Map<String, dynamic> data;
+
   /// Default List of asset files that for this component type
   final Set<String> assets;
+
+  /// Default List of asset files that for this component type
+  final Map<String, Function(GameComponentUiContext ctx, ImageTools images)>
+      buildAssets;
 
   /// Default renderers for this component type
   final GameComponentRenderer renderer;
 
   GameComponentType({
+    required this.data,
     required this.assets,
+    required this.buildAssets,
     required this.components,
     required this.renderer,
     required this.size,
@@ -116,12 +134,12 @@ class GameComponent {
   /// Override the default renderers for this component
   final GameComponentRenderer? renderer;
 
-  /// List of asset files that are required to be loaded for this component
-  final Set<String> assets;
+  // /// List of asset files that are required to be loaded for this component
+  // final Set<String> assets;
 
   GameComponent({
     required this.data,
-    required this.assets,
+    // required this.assets,
     this.size,
     this.renderer,
   });

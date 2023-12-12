@@ -34,15 +34,15 @@ class Game {
     double bleed = 0.0,
     double dpi = 70,
     // required GameComponentBoxConstraints displayConstraints,
-  }) {
+  }) async {
     final componentType =
         components.values.firstWhere((ct) => ct.components.contains(component));
 
-    final assetsPaths = <String>{
-      ...assetsCore,
-      ...componentType.assets,
-      ...component.assets
-    };
+    // final assetsPaths = <String>{
+    //   ...assetsCore,
+    //   ...componentType.assets,
+    //   // ...component.assets
+    // };
 
     final context = GameComponentUiContext(
       log: log,
@@ -54,7 +54,7 @@ class Game {
 
       theme: theme,
       // resolution: resolution,
-      assets: assetsPaths,
+      // assets: assetsPaths,
       // constraints: displayConstraints,
       dpi: GameDpi(dpi: dpi),
       bleed: bleed,
@@ -65,7 +65,7 @@ class Game {
     return ui.container(
         size: context.sizeWithBleed,
         child: ui.stack(
-            children: (component.renderer ?? componentType.renderer)
+            children: await (component.renderer ?? componentType.renderer)
                 .frontBuilder(ctx: context, showDebug: true)
               ..addAll(showDebug ? ui.componentDebugOverlay(context) : [])));
   }

@@ -10,4 +10,4 @@ export 'src/assets.dart';
 
 export 'http.dart';
 export 'data.dart';
-// export 'image.dart';
+export 'image.dart';
