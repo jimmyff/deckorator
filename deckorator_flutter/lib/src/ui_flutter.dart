@@ -54,7 +54,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                     strokeAlign: BorderSide.strokeAlignInside)),
         child: Image.memory(
           bytes,
-          fit: BoxFit.fill,
+          fit: BoxFit.contain,
         ));
   }
 
@@ -275,6 +275,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
   }
 
   Widget positioned({
+    GameComponentOffset? offset,
     double? top,
     double? right,
     double? bottom,
@@ -285,10 +286,10 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
     bool? showDebug,
   }) =>
       Positioned(
-          top: dpi.mmNull(top),
-          left: dpi.mmNull(left),
-          right: dpi.mmNull(right),
-          bottom: dpi.mmNull(bottom),
+          top: dpi.mmNull(offset?.top ?? top),
+          left: dpi.mmNull(offset?.left ?? left),
+          right: dpi.mmNull(offset?.right ?? right),
+          bottom: dpi.mmNull(offset?.bottom ?? bottom),
           height: dpi.mmNull(height),
           width: dpi.mmNull(width),
           child: Container(

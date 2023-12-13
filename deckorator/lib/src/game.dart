@@ -62,6 +62,9 @@ class Game {
       component: component,
     );
 
+    log.info(
+        'Rendering front of component dpi:$dpi, size: ${componentType.size}');
+
     return ui.container(
         size: context.sizeWithBleed,
         child: ui.stack(

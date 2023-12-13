@@ -26,6 +26,7 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
     required List<dWidget> children,
   });
   dWidget positioned({
+    GameComponentOffset? offset,
     double? top,
     double? right,
     double? bottom,

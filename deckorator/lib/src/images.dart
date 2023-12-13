@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart';
+import 'package:logging/logging.dart';
 
 class ImageTools {
   /// Creates a mask
@@ -67,7 +68,10 @@ class ImageTools {
     required Image image,
     int? width = null,
     int? height = null,
+    Logger? log,
   }) {
+    log?.info(
+        'Resizing image (${image.width}x${image.height}) to $width x $height');
     return copyResize(image,
         width: width, height: height, interpolation: Interpolation.cubic);
   }
