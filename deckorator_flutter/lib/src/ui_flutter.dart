@@ -41,10 +41,13 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
       );
 
   Widget imageFromBytes({
+    required GameComponentPoint size,
     required Uint8List bytes,
     bool? showDebug,
   }) {
     return Container(
+        width: size.x,
+        height: size.y,
         decoration: BoxDecoration(
             border: !(showDebug ?? debugEnabled)
                 ? null
@@ -54,7 +57,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                     strokeAlign: BorderSide.strokeAlignInside)),
         child: Image.memory(
           bytes,
-          fit: BoxFit.contain,
+          fit: BoxFit.fill,
         ));
   }
 

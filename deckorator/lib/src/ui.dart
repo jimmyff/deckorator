@@ -43,6 +43,7 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
   });
 
   dWidget imageFromBytes({
+    required GameComponentPoint size,
     required Uint8List bytes,
     bool? showDebug,
   });

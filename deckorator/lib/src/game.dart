@@ -63,7 +63,7 @@ class Game {
     );
 
     log.info(
-        'Rendering front of component dpi:$dpi, size: ${componentType.size}');
+        'Rendering front of component dpi:$dpi, size: ${componentType.size} with bleed: $bleed');
 
     return ui.container(
         size: context.sizeWithBleed,
