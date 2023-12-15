@@ -2,21 +2,29 @@ import 'dart:typed_data';
 import 'package:deckorator/deckorator.dart';
 import 'package:flutter/widgets.dart';
 
+/// UI tooling for generating Flutter widgets.
 class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
-  get defaultTextSize => 4.0;
+  get defaultTextSize => 3.0;
   get defaultTextColor => Color.fromRGBO(0, 0, 0, 1.0);
   get defaultFont => 'Faehound';
 
-  Widget text(String text, {Color? color, double? size}) => Text(
+  @override
+  Widget text(String text,
+          {Color? color,
+          double? size,
+          bool wrap = false,
+          bool center = true}) =>
+      Text(
         text,
-        softWrap: false,
-        textAlign: TextAlign.center,
+        softWrap: wrap,
+        textAlign: center ? TextAlign.center : null,
         style: TextStyle(
-            fontFamily: defaultFont,
-            fontSize: dpi.mm(size ?? defaultTextSize),
-            color: color ?? defaultTextColor,
-            height: 1.0,
-            overflow: TextOverflow.visible),
+          fontFamily: defaultFont,
+          fontSize: dpi.mm(size ?? defaultTextSize),
+          color: color ?? defaultTextColor,
+          height: wrap ? 1.5 : 1.0,
+          overflow: TextOverflow.visible,
+        ),
       );
   EdgeInsets edgeInset({
     double left = 0.0,
@@ -30,6 +38,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
           top: dpi.mm(top),
           bottom: dpi.mm(bottom));
 
+  @override
   Widget stack({
     required List<dynamic> children,
   }) =>
@@ -37,6 +46,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
         children: List<Widget>.from(children),
       );
 
+  @override
   Widget imageFromBytes({
     required GameComponentSize size,
     required Uint8List bytes,
@@ -58,6 +68,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
         ));
   }
 
+  @override
   Widget image({
     required String assetPath,
     bool? showDebug,
@@ -87,6 +98,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                   )));
   }
 
+  @override
   Widget positioned({
     GameComponentOffset? offset,
     double? top,
@@ -118,6 +130,8 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
   Widget container({
     bool? showDebug,
     GameComponentSize? size,
+    double? height,
+    double? width,
     Widget? child,
     Color? color,
     EdgeInsets? padding,
@@ -134,16 +148,18 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                     color: Color.fromRGBO(0, 0, 255, 1.0),
                     strokeAlign: BorderSide.strokeAlignInside)),
 
-        width: dpi.mmNull(size?.width),
-        height: dpi.mmNull(size?.height),
+        width: dpi.mmNull(width ?? size?.width),
+        height: dpi.mmNull(height ?? size?.height),
         // constraints: BoxConstraints.tightFor(
         //     width: constraints.minWidth, height: constraints.minHeight),
         child: child,
       );
 
+  @override
   Color colorHex(String hex) => HexColor.fromHex(hex);
 
-  List<Widget> componentDebugOverlay(GameComponentUiContext ctx) {
+  @override
+  List<Widget> componentDebugOverlay(GameComponentBuildContext ctx) {
     return [
       // Show working area
       ctx.ui.positioned(
@@ -199,6 +215,61 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
               .container(showDebug: false, color: ctx.ui.colorHex('#333333')))
     ];
   }
+
+  @override
+  Widget flexChild({required Widget child, int flex = 1, bool? showDebug}) =>
+      Flexible(
+        flex: flex,
+        child: Center(child: child),
+      );
+
+  @override
+  Widget row(
+      {List<dynamic>? dividers,
+      required List<dynamic> children,
+      bool? showDebug,
+      GameComponentSize? size}) {
+    final childrenWithSeperators = [];
+
+    for (var i = 0, l = children.length; i < l; i++) {
+      childrenWithSeperators.add(children[i]);
+      if (i < children.length - 1) {
+        childrenWithSeperators.add((dividers ?? []).contains(i)
+            ? dividers![i]
+            : container(
+                width: 2,
+              ));
+      }
+    }
+    return container(
+      size: size,
+      child: Row(
+
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: List<Widget>.from(childrenWithSeperators)),
+    );
+  }
+
+  @override
+  Widget column(
+          {required List<dynamic> children,
+          bool? showDebug,
+          GameComponentSize? size}) =>
+      container(
+        size: size,
+        child: Column(
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: List<Widget>.from(children)),
+      );
+
+  @override
+  Widget rotate({required Widget child, int rotations = 0, bool? showDebug}) =>
+      RotatedBox(
+        quarterTurns: rotations,
+        child: child,
+      );
 }
 
 extension HexColor on Color {

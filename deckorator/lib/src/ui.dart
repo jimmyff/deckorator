@@ -7,16 +7,21 @@ import 'geometry.dart';
 import 'renderer.dart';
 import 'assets.dart';
 
+/// Abstract standard interface for a Platform UI library.
+/// Currently used by FlutterTools and PdfTools.
 abstract class UiTools<dWidget, dColor, dEdgeInsets> {
   Logger? log;
   bool debugEnabled = false;
   GameDpi dpi = GameDpi(dpi: 70);
   late AssetLoader assets;
 
-  dWidget text(String text, {dColor? color, double? size});
+  dWidget text(String text,
+      {dColor? color, double? size, bool wrap = false, bool center = true});
   dWidget container({
     bool? showDebug,
     GameComponentSize? size,
+    double? height,
+    double? width,
     dWidget? child,
     dColor? color,
     dEdgeInsets? padding,
@@ -34,6 +39,29 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
     double? height,
     double? width,
     required dWidget child,
+    bool? showDebug,
+  });
+
+  dWidget row({
+    required List<dWidget> children,
+    List<dWidget>? dividers,
+    GameComponentSize? size,
+    bool? showDebug,
+  });
+  dWidget column({
+    required List<dWidget> children,
+    GameComponentSize? size,
+    bool? showDebug,
+  });
+
+  dWidget flexChild({
+    required dWidget child,
+    int flex = 1,
+    bool? showDebug,
+  });
+  dWidget rotate({
+    required dWidget child,
+    int rotations = 0,
     bool? showDebug,
   });
 
@@ -56,5 +84,5 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
     double bottom = 0.0,
   });
 
-  List<dWidget> componentDebugOverlay(GameComponentUiContext ctx);
+  List<dWidget> componentDebugOverlay(GameComponentBuildContext ctx);
 }

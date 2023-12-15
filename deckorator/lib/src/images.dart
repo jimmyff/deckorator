@@ -4,6 +4,9 @@ import 'package:image/image.dart';
 import 'package:logging/logging.dart';
 import 'renderer.dart';
 
+/// The library for manipulating images. These are mostly used in
+/// ComponentRenderers when using the buildAsset feature. Allows resizing,
+/// masking & coloring of images.
 class ImageTools {
   GameDpi dpi = GameDpi(dpi: 70);
 

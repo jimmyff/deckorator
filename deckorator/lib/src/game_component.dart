@@ -7,37 +7,47 @@ import 'ui.dart';
 import 'assets.dart';
 import 'images.dart';
 
-class GameComponentUiContext {
+/// Context when building a component. This has everything you might need to
+/// generate a component.
+class GameComponentBuildContext {
   final Logger log;
   final UiTools ui;
+
+  /// For manipulating images (masking, resizing etc)
   final ImageTools images;
 
   final GameDpi dpi;
 
   final GameTheme theme;
 
-  // final Set<String> assets;
-
+  /// Allows you to generate a component - this is usually used for complex
+  /// image manipulation steps such as masking.
   Future<Uint8List> buildAsset(String assetKey) async {
     return await renderer.buildAsset(key: assetKey, ctx: this);
   }
 
   final double bleed;
-
   final GameComponentType componentType;
   final GameComponent component;
 
-  GameComponentSize get size => GameComponentSize(
-      (component.size?.width ?? componentType.size.width),
-      (component.size?.height ?? componentType.size.height));
+  GameComponentSize get size => componentType.size;
 
   GameComponentSize get sizeWithBleed => GameComponentSize(
-      (component.size?.width ?? componentType.size.width) + (bleed * 2),
-      (component.size?.height ?? componentType.size.height) + (bleed * 2));
+      componentType.size.width + (bleed * 2),
+      componentType.size.height + (bleed * 2));
 
-  T data<T>(String key) => component.data.containsKey(key)
-      ? component.data[key]!
-      : componentType.data[key];
+  String dataString(String key) => data(key).toString();
+
+  T data<T>(String key) {
+    if (!component.data.containsKey(key) &&
+        !componentType.data.containsKey(key)) {
+      throw Exception('Data not found with key $key');
+    }
+
+    return component.data.containsKey(key)
+        ? component.data[key]!
+        : componentType.data[key];
+  }
 
   GameComponentRenderer get renderer =>
       component.renderer != null ? component.renderer! : componentType.renderer;
@@ -48,44 +58,17 @@ class GameComponentUiContext {
   double percentageOfWidth(num v) => size.x * (v / 100);
   double percentageOfHeight(num v) => size.y * (v / 100);
 
-/*
-
-  width = 100
-  bleed = 5
-  total width = 110
-
-  space = 220 / (110)
-
-*/
-  GameComponentUiContext({
+  GameComponentBuildContext({
     required this.log,
     required this.ui,
     required this.images,
     required this.theme,
-    // required this.assets,
-    // required this.resolution,
-    // required this.pdfContext,
-    // required this.constraints,
     required this.dpi,
     required double bleed,
     required this.componentType,
     required this.component,
-  }) : this.bleed = bleed
-  // ,
-  //       scale = constraints.maxWidth /
-  //           ((component.size?.x ?? componentType.size.x) + (bleed * 2)
-  // )
-  {
-    // print('scale: $scale');
-    // print('maxWidth: ${constraints.maxWidth}');
-    // print('constraints: ${constraints}');
-
-    // this.resolution.setScale(scale);
-  }
-  // final pw;
+  }) : this.bleed = bleed;
 }
-
-// typedef pw.Widget WidgetBuildFunction(GameComponentUiContext context);
 
 /// Collection of components of the same type (Monster, Equipment, Class etc)
 class GameComponentType {
@@ -94,6 +77,7 @@ class GameComponentType {
   /// Default size for this component type
   final GameComponentSize size;
 
+  /// Data (keys+values) that can be accessed by your GameComponentRenderer
   final Map<String, dynamic> data;
 
   /// Default List of asset files that for this component type
@@ -113,19 +97,16 @@ class GameComponentType {
 
 // A generic component object that is used by PDF tools
 class GameComponent {
+  /// Data (keys+values) that can be accessed by your GameComponentRenderer
+  /// This will be added to any data in this GameComponentType
   final Map<String, dynamic> data;
-  final GameComponentSize? size;
 
   /// Override the default renderers for this component
   final GameComponentRenderer? renderer;
 
-  // /// List of asset files that are required to be loaded for this component
-  // final Set<String> assets;
-
   GameComponent({
     required this.data,
     // required this.assets,
-    this.size,
     this.renderer,
   });
 }

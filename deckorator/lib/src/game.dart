@@ -45,7 +45,7 @@ class Game {
     //   // ...component.assets
     // };
 
-    final context = GameComponentUiContext(
+    final context = GameComponentBuildContext(
       log: log,
       ui: ui
         ..assets = assets
