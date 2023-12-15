@@ -10,6 +10,7 @@ import 'images.dart';
 class GameComponentUiContext {
   final Logger log;
   final UiTools ui;
+  final ImageTools images;
 
   final GameDpi dpi;
 
@@ -18,7 +19,7 @@ class GameComponentUiContext {
   // final Set<String> assets;
 
   Future<Uint8List> buildAsset(String assetKey) async {
-    return await componentType.buildAssets[assetKey]!(this, ImageTools());
+    return await renderer.buildAsset(key: assetKey, ctx: this);
   }
 
   final double bleed;
@@ -26,32 +27,20 @@ class GameComponentUiContext {
   final GameComponentType componentType;
   final GameComponent component;
 
-  GameComponentPoint get size => GameComponentPoint(
-      (component.size?.x ?? componentType.size.x),
-      (component.size?.y ?? componentType.size.y));
+  GameComponentSize get size => GameComponentSize(
+      (component.size?.width ?? componentType.size.width),
+      (component.size?.height ?? componentType.size.height));
 
-  GameComponentPoint get sizeWithBleed => GameComponentPoint(
-      (component.size?.x ?? componentType.size.x) + (bleed * 2),
-      (component.size?.y ?? componentType.size.y) + (bleed * 2));
-
-  // Scaling
-  // GameComponentPoint get size =>
-  //     GameComponentPoint(sizeUnscaled.x * scale, sizeUnscaled.y * scale);
-  // double get bleedScaled => bleed * scale;
-
-  // Uint8List assetData(String key) {
-  //   if (!assets.containsKey(key))
-  //     throw Exception(
-  //         'Asset not found with key: $key. Did you declare it in the GameComponent asset array?');
-  //   return assets[key]!;
-  // }
+  GameComponentSize get sizeWithBleed => GameComponentSize(
+      (component.size?.width ?? componentType.size.width) + (bleed * 2),
+      (component.size?.height ?? componentType.size.height) + (bleed * 2));
 
   T data<T>(String key) => component.data.containsKey(key)
       ? component.data[key]!
       : componentType.data[key];
 
-  // double widthPercent(num v) => percentageOfWidth(v) * dpi;
-  // double heightPercent(num v) => percentageOfHeight(v) * dpi;
+  GameComponentRenderer get renderer =>
+      component.renderer != null ? component.renderer! : componentType.renderer;
 
   double widthWithBleed(double bleed) => size.x + (bleed * 2);
   double heightWithBleed(double bleed) => size.y + (bleed * 2);
@@ -71,6 +60,7 @@ class GameComponentUiContext {
   GameComponentUiContext({
     required this.log,
     required this.ui,
+    required this.images,
     required this.theme,
     // required this.assets,
     // required this.resolution,
@@ -102,16 +92,12 @@ class GameComponentType {
   final List<GameComponent> components;
 
   /// Default size for this component type
-  final GameComponentPoint size;
+  final GameComponentSize size;
 
   final Map<String, dynamic> data;
 
   /// Default List of asset files that for this component type
   final Set<String> assets;
-
-  /// Default List of asset files that for this component type
-  final Map<String, Function(GameComponentUiContext ctx, ImageTools images)>
-      buildAssets;
 
   /// Default renderers for this component type
   final GameComponentRenderer renderer;
@@ -119,7 +105,6 @@ class GameComponentType {
   GameComponentType({
     required this.data,
     required this.assets,
-    required this.buildAssets,
     required this.components,
     required this.renderer,
     required this.size,
@@ -129,7 +114,7 @@ class GameComponentType {
 // A generic component object that is used by PDF tools
 class GameComponent {
   final Map<String, dynamic> data;
-  final GameComponentPoint? size;
+  final GameComponentSize? size;
 
   /// Override the default renderers for this component
   final GameComponentRenderer? renderer;

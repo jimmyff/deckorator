@@ -4,6 +4,7 @@ import 'theme.dart';
 import 'renderer.dart';
 import 'ui.dart';
 import 'assets.dart';
+import 'images.dart';
 
 // A generic game
 class Game {
@@ -51,6 +52,7 @@ class Game {
         ..debugEnabled = showDebug
         ..dpi = GameDpi(dpi: dpi)
         ..log = log,
+      images: ImageTools()..dpi = GameDpi(dpi: dpi),
 
       theme: theme,
       // resolution: resolution,
@@ -69,7 +71,7 @@ class Game {
         size: context.sizeWithBleed,
         child: ui.stack(
             children: await (component.renderer ?? componentType.renderer)
-                .frontBuilder(ctx: context, showDebug: true)
+                .buildFront(ctx: context, showDebug: true)
               ..addAll(showDebug ? ui.componentDebugOverlay(context) : [])));
   }
 }

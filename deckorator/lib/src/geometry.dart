@@ -1,9 +1,16 @@
+class GameComponentSize extends GameComponentPoint {
+  factory GameComponentSize.cardBridge() => GameComponentSize(56.0, 87.0);
+  factory GameComponentSize.cardPoker() => GameComponentSize(63.0, 88.0);
+  factory GameComponentSize.cardTarot() => GameComponentSize(70.0, 120.0);
+
+  GameComponentSize(double width, double height) : super(width, height);
+
+  double get width => x;
+  double get height => y;
+}
+
 class GameComponentPoint {
   const GameComponentPoint(this.x, this.y);
-
-  factory GameComponentPoint.cardBridge() => GameComponentPoint(56.0, 87.0);
-  factory GameComponentPoint.cardPoker() => GameComponentPoint(63.0, 88.0);
-  factory GameComponentPoint.cardTarot() => GameComponentPoint(70.0, 120.0);
 
   final double x, y;
 

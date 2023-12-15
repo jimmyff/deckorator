@@ -1,10 +1,15 @@
+import 'dart:typed_data';
 import 'game.dart';
 import 'game_component.dart';
 
 abstract class GameComponentRenderer<dWidget> {
-  Future<List<dWidget>> frontBuilder(
+  Future<Uint8List> buildAsset(
+      {required String key, required GameComponentUiContext ctx});
+
+  Future<List<dWidget>> buildFront(
       {required GameComponentUiContext ctx, bool showDebug = false});
-  List<dWidget> backBuilder(GameComponentUiContext context);
+
+  List<dWidget> buildBack(GameComponentUiContext context);
 }
 
 class GameDpi {

@@ -16,7 +16,7 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
   dWidget text(String text, {dColor? color, double? size});
   dWidget container({
     bool? showDebug,
-    GameComponentPoint? size,
+    GameComponentSize? size,
     dWidget? child,
     dColor? color,
     dEdgeInsets? padding,
@@ -43,18 +43,11 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
   });
 
   dWidget imageFromBytes({
-    required GameComponentPoint size,
+    required GameComponentSize size,
     required Uint8List bytes,
     bool? showDebug,
   });
 
-  dWidget mask({
-    required String assetPath,
-    required String assetPathMask,
-    dColor? maskColor,
-    dWidget? child,
-    bool? showDebug,
-  });
   dColor colorHex(String hex);
   dEdgeInsets edgeInset({
     double left = 0.0,

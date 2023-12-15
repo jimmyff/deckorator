@@ -13,7 +13,6 @@ dependencies:
 
   deckorator:
     path: ../../deckorator/deckorator
-  widget_mask: ^1.0.0+0
 
 dev_dependencies:
   flutter_test:

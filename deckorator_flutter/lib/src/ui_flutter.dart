@@ -1,9 +1,6 @@
 import 'dart:typed_data';
-import 'package:flutter/painting.dart' as painting;
 import 'package:deckorator/deckorator.dart';
 import 'package:flutter/widgets.dart';
-
-import 'package:widget_mask/widget_mask.dart';
 
 class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
   get defaultTextSize => 4.0;
@@ -41,7 +38,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
       );
 
   Widget imageFromBytes({
-    required GameComponentPoint size,
+    required GameComponentSize size,
     required Uint8List bytes,
     bool? showDebug,
   }) {
@@ -80,47 +77,6 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                     snapshot.data!,
                     fit: BoxFit.fill,
                   )
-                // WidgetMask(
-                //     // `BlendMode.difference` results in the negative of `dst` where `src`
-                //     // is fully white. That is why the text is white.
-                //     blendMode: BlendMode.screen,
-                //     mask: Image.memory(
-                //       snapshot.data!,
-                //       fit: BoxFit.fill,
-                //     ),
-                //     child: Container(
-                //       color: colorHex('#908723'),
-                //     ),
-                //   )
-
-                // ColorFiltered(
-                //     colorFilter:
-                //         ColorFilter.mode(colorHex('#a6F742'), BlendMode.srcIn),
-                //     child: Image.memory(
-                //       snapshot.data!,
-                //       fit: BoxFit.fill,
-                //     ),
-                //   )
-//
-                // ShaderMask(
-                //     shaderCallback: (Rect bounds) {
-                //       return painting.ColorFilter.mode(
-                //           painting.Color(), painting.BlendMode);
-                //       // return LinearGradient(
-                //       //   colors: <Color>[
-                //       //     colorHex('#F6F7D2'),
-                //       //     colorHex('#D6D7B2')
-                //       //   ],
-                //       //   begin: Alignment.topCenter,
-                //       //   end: Alignment.bottomCenter,
-                //       //   tileMode: TileMode.clamp,
-                //       // ).createShader(bounds);
-                //     },
-                //     blendMode: BlendMode.srcIn,
-                //     child: Image.memory(
-                //       snapshot.data!,
-                //       fit: BoxFit.fill,
-                //     ))
                 : Container(
                     color: snapshot.hasError
                         ? colorHex('#9A114F')
@@ -129,152 +85,6 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                         '${snapshot.hasError ? snapshot.error : 'Loading'}',
                         color: colorHex('#ffffff')),
                   )));
-  }
-
-  Widget mask({
-    required String assetPath,
-    required String assetPathMask,
-    Color? maskColor,
-    Widget? child,
-    bool? showDebug,
-  }) {
-    return Stack(children: [
-      FutureBuilder<Uint8List>(
-          future: assets.load(assetPathMask, log: log),
-          builder: (context, snapshot) => snapshot.hasData
-              ? ColorFiltered(
-                  colorFilter: ColorFilter.mode(
-                      maskColor ?? colorHex('#ffffff'), BlendMode.modulate),
-                  child: Image.memory(
-                    snapshot.data!,
-                    fit: BoxFit.fill,
-                  ),
-                )
-              : Container(
-                  color: snapshot.hasError
-                      ? colorHex('#9A114F')
-                      : colorHex('#000000'),
-                  child: text(
-                      '${snapshot.hasError ? snapshot.error : 'Loading'}',
-                      color: colorHex('#ffffff')),
-                )),
-
-      // top layer
-      FutureBuilder<Uint8List>(
-          future: assets.load(assetPath, log: log),
-          builder: (context, snapshot) => snapshot.hasData
-              ? Image.memory(
-                  snapshot.data!,
-                  fit: BoxFit.fill,
-                )
-              : Container(
-                  color: snapshot.hasError
-                      ? colorHex('#9A114F')
-                      : colorHex('#000000'),
-                  child: text(
-                      '${snapshot.hasError ? snapshot.error : 'Loading'}',
-                      color: colorHex('#ffffff')),
-                )),
-    ]);
-  }
-
-  Widget mask2({
-    required String assetPath,
-    required String assetPathMask,
-    Color? maskColor,
-    Widget? child,
-    bool? showDebug,
-  }) {
-    return Stack(children: [
-      FutureBuilder<Uint8List>(
-          future: assets.load(assetPathMask, log: log),
-          builder: (context, snapshot) => snapshot.hasData
-              ? WidgetMask(
-                  // `BlendMode.difference` results in the negative of `dst` where `src`
-                  // is fully white. That is why the text is white.
-                  blendMode: BlendMode.modulate,
-                  mask: Image.memory(
-                    snapshot.data!,
-                    fit: BoxFit.fill,
-                  ),
-                  child: Container(
-                    color: maskColor,
-                    child: child,
-                  ))
-              : Container(
-                  color: snapshot.hasError
-                      ? colorHex('#9A114F')
-                      : colorHex('#000000'),
-                  child: text(
-                      '${snapshot.hasError ? snapshot.error : 'Loading'}',
-                      color: colorHex('#ffffff')),
-                )),
-//       Container(
-//           decoration: BoxDecoration(
-//               border: !(showDebug ?? debugEnabled)
-//                   ? null
-//                   : Border.all(
-//                       color: Color.fromRGBO(229, 255, 0, 1),
-//                       style: BorderStyle.solid,
-//                       strokeAlign: BorderSide.strokeAlignInside)),
-//           child: FutureBuilder<Uint8List>(
-//               future: assets.load(assetPath, log: log),
-//               builder: (context, snapshot) => snapshot.hasData
-//                   ? Image.memory(
-//                       snapshot.data!,
-//                       fit: BoxFit.fill,
-//                     )
-//                   // WidgetMask(
-//                   //     // `BlendMode.difference` results in the negative of `dst` where `src`
-//                   //     // is fully white. That is why the text is white.
-//                   //     blendMode: BlendMode.screen,
-//                   //     mask:
-//                   //     Image.memory(
-//                   //       snapshot.data!,
-//                   //       fit: BoxFit.fill,
-//                   //     ),
-//                   //     child: Container(
-//                   //       color: colorHex('#908723'),
-//                   //     ),
-//                   //   )
-
-//                   // ColorFiltered(
-//                   //     colorFilter:
-//                   //         ColorFilter.mode(colorHex('#a6F742'), BlendMode.srcIn),
-//                   //     child: Image.memory(
-//                   //       snapshot.data!,
-//                   //       fit: BoxFit.fill,
-//                   //     ),
-//                   //   )
-// //
-//                   // ShaderMask(
-//                   //     shaderCallback: (Rect bounds) {
-//                   //       return painting.ColorFilter.mode(
-//                   //           painting.Color(), painting.BlendMode);
-//                   //       // return LinearGradient(
-//                   //       //   colors: <Color>[
-//                   //       //     colorHex('#F6F7D2'),
-//                   //       //     colorHex('#D6D7B2')
-//                   //       //   ],
-//                   //       //   begin: Alignment.topCenter,
-//                   //       //   end: Alignment.bottomCenter,
-//                   //       //   tileMode: TileMode.clamp,
-//                   //       // ).createShader(bounds);
-//                   //     },
-//                   //     blendMode: BlendMode.srcIn,
-//                   //     child: Image.memory(
-//                   //       snapshot.data!,
-//                   //       fit: BoxFit.fill,
-//                   //     ))
-//                   : Container(
-//                       color: snapshot.hasError
-//                           ? colorHex('#9A114F')
-//                           : colorHex('#000000'),
-//                       child: text(
-//                           '${snapshot.hasError ? snapshot.error : 'Loading'}',
-//                           color: colorHex('#ffffff')),
-//                     )))
-    ]);
   }
 
   Widget positioned({
@@ -307,7 +117,7 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
 
   Widget container({
     bool? showDebug,
-    GameComponentPoint? size,
+    GameComponentSize? size,
     Widget? child,
     Color? color,
     EdgeInsets? padding,
@@ -324,8 +134,8 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
                     color: Color.fromRGBO(0, 0, 255, 1.0),
                     strokeAlign: BorderSide.strokeAlignInside)),
 
-        width: dpi.mmNull(size?.x),
-        height: dpi.mmNull(size?.y),
+        width: dpi.mmNull(size?.width),
+        height: dpi.mmNull(size?.height),
         // constraints: BoxConstraints.tightFor(
         //     width: constraints.minWidth, height: constraints.minHeight),
         child: child,
@@ -407,53 +217,3 @@ extension HexColor on Color {
       '${green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';
 }
-
-// // Applies a BlendMode to its child.
-// class BlendMask extends SingleChildRenderObjectWidget {
-//   final BlendMode _blendMode;
-//   final double _opacity;
-
-//   BlendMask(
-//       {required BlendMode blendMode,
-//       double opacity = 1.0,
-//       Key? key,
-//       Widget? child})
-//       : _blendMode = blendMode,
-//         _opacity = opacity,
-//         super(key: key, child: child);
-
-//   @override
-//   RenderObject createRenderObject(context) {
-//     return RenderBlendMask(_blendMode, _opacity);
-//   }
-
-//   @override
-//   void updateRenderObject(BuildContext context, RenderBlendMask renderObject) {
-//     renderObject._blendMode = _blendMode;
-//     renderObject._opacity = _opacity;
-//   }
-// }
-
-// class RenderBlendMask extends RenderProxyBox {
-//   BlendMode _blendMode;
-//   double _opacity;
-
-//   RenderBlendMask(BlendMode blendMode, double opacity)
-//       : _blendMode = blendMode,
-//         _opacity = opacity;
-
-//   @override
-//   void paint(context, offset) {
-//     // Create a new layer and specify the blend mode and opacity to composite it with:
-//     context.canvas.saveLayer(
-//         offset & size,
-//         Paint()
-//           ..blendMode = _blendMode
-//           ..color = Color.fromARGB((_opacity * 255).round(), 255, 255, 255));
-
-//     super.paint(context, offset);
-
-//     // Composite the layer back into the canvas using the blendmode:
-//     context.canvas.restore();
-//   }
-// }

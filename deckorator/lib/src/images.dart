@@ -2,23 +2,29 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart';
 import 'package:logging/logging.dart';
+import 'renderer.dart';
 
 class ImageTools {
+  GameDpi dpi = GameDpi(dpi: 70);
+
   /// Creates a mask
   Image mask({
     Image? image,
     String? hexColor,
     required Image mask,
-    int offsetX = 0,
-    int offsetY = 0,
+    double offsetX = 0.0,
+    double offsetY = 0.0,
   }) {
+    final offsetXint = dpi.mm(offsetX).round();
+    final offsetYint = dpi.mm(offsetY).round();
+
     final comp = Image(width: mask.width, height: mask.height, numChannels: 4);
     final color = hexColor == null ? null : colorFromHex(hexColor);
 
     for (var y = 0, yl = mask.height; y < yl; y++) {
       for (var x = 0, xl = mask.width; x < xl; x++) {
-        final imgX = x - offsetX;
-        final imgY = y - offsetY;
+        final imgX = x - offsetXint;
+        final imgY = y - offsetYint;
         final maskPixel = mask.getPixel(x, y);
         final lum = getLuminanceRgb(maskPixel.r, maskPixel.g, maskPixel.b);
 
@@ -66,14 +72,16 @@ class ImageTools {
   /// Creates a mask
   Image resize({
     required Image image,
-    int? width = null,
-    int? height = null,
+    double? width = null,
+    double? height = null,
     Logger? log,
   }) {
+    final widthInt = dpi.mmNull(width)?.round();
+    final heightInt = dpi.mmNull(height)?.round();
     log?.info(
         'Resizing image (${image.width}x${image.height}) to $width x $height');
     return copyResize(image,
-        width: width, height: height, interpolation: Interpolation.cubic);
+        width: widthInt, height: heightInt, interpolation: Interpolation.cubic);
   }
 
   /// Decodes bytes to image
