@@ -13,11 +13,15 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
           {Color? color,
           double? size,
           bool wrap = false,
-          bool center = true}) =>
+          GameComponentAlignment alignment = GameComponentAlignment.middle}) =>
       Text(
         text,
         softWrap: wrap,
-        textAlign: center ? TextAlign.center : null,
+        textAlign: alignment == GameComponentAlignment.middle
+            ? TextAlign.center
+            : (alignment == GameComponentAlignment.start
+                ? TextAlign.left
+                : TextAlign.right),
         style: TextStyle(
           fontFamily: defaultFont,
           fontSize: dpi.mm(size ?? defaultTextSize),

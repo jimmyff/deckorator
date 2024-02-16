@@ -2,13 +2,20 @@ class GameTheme {
   /// Named colors
   final Map<String, ThemeColor> colors;
 
+  final double fontSizeText;
+  final double fontSizeHeading;
+
   // String colorHex(String key) {
   //   if (!colors.containsKey(key))
   //     throw Exception('Color not found with key: $key');
   //   return colors[key]!;
   // }
 
-  GameTheme({required this.colors});
+  GameTheme({
+    required this.colors,
+    this.fontSizeText = 2.2,
+    this.fontSizeHeading = 2.7,
+  });
 }
 
 class ThemeColor {

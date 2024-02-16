@@ -1,3 +1,9 @@
+enum GameComponentAlignment {
+  start,
+  middle,
+  end,
+}
+
 class GameComponentSize extends GameComponentPoint {
   factory GameComponentSize.cardBridge() => GameComponentSize(56.0, 87.0);
   factory GameComponentSize.cardPoker() => GameComponentSize(63.0, 88.0);

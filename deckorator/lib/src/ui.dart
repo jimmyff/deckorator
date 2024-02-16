@@ -16,7 +16,10 @@ abstract class UiTools<dWidget, dColor, dEdgeInsets> {
   late AssetLoader assets;
 
   dWidget text(String text,
-      {dColor? color, double? size, bool wrap = false, bool center = true});
+      {dColor? color,
+      double? size,
+      bool wrap = false,
+      GameComponentAlignment alignment = GameComponentAlignment.middle});
   dWidget container({
     bool? showDebug,
     GameComponentSize? size,
