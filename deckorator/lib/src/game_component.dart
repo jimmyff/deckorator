@@ -6,6 +6,7 @@ import 'theme.dart';
 import 'ui.dart';
 import 'assets.dart';
 import 'images.dart';
+import 'data/data_table.dart';
 
 /// Context when building a component. This has everything you might need to
 /// generate a component.
@@ -39,13 +40,12 @@ class GameComponentBuildContext {
   String dataString(String key) => data(key).toString();
 
   T data<T>(String key) {
-    if (!component.data.containsKey(key) &&
-        !componentType.data.containsKey(key)) {
+    if (!component.data.has(key) && !componentType.data.containsKey(key)) {
       throw Exception('Data not found with key $key');
     }
 
-    return component.data.containsKey(key)
-        ? component.data[key]!
+    return component.data.has(key)
+        ? component.data.value(key)
         : componentType.data[key];
   }
 
@@ -99,7 +99,7 @@ class GameComponentType {
 class GameComponent {
   /// Data (keys+values) that can be accessed by your GameComponentRenderer
   /// This will be added to any data in this GameComponentType
-  final Map<String, dynamic> data;
+  final DataTableRow data;
 
   /// Override the default renderers for this component
   final GameComponentRenderer? renderer;

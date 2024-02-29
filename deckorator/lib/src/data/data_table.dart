@@ -64,4 +64,34 @@ class DataTableRow extends ListBase<dynamic> {
       rethrow;
     }
   }
+
+  double? valueAsDouble(String key) {
+    // TODO: This try catch needs to be generic for this and value
+    try {
+      return data[keys.indexOf(key)] == ""
+          ? null
+          : double.parse(data[keys.indexOf(key)].toString().trim());
+    } catch (e, _) {
+      if (keys.indexOf(key) == -1)
+        throw Exception("No column with key: '$key'");
+      rethrow;
+    }
+  }
+
+  List<String> valueAsList(String key) {
+    // TODO: This try catch needs to be generic for this and value
+    try {
+      return data[keys.indexOf(key)] == ""
+          ? []
+          : data[keys.indexOf(key)]
+              .toString()
+              .split(',')
+              .map((e) => e.trim())
+              .toList();
+    } catch (e, _) {
+      if (keys.indexOf(key) == -1)
+        throw Exception("No column with key: '$key'");
+      rethrow;
+    }
+  }
 }

@@ -17,8 +17,10 @@ class Game {
 
   /// Assets that will be provided to every component
   final Set assetsCore;
+  final String name;
 
   Game({
+    required this.name,
     // required this.resolution,
     required this.theme,
     required this.components,

@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
   get defaultTextSize => 3.0;
   get defaultTextColor => Color.fromRGBO(0, 0, 0, 1.0);
-  get defaultFont => 'Faehound';
+  get defaultFont => 'UltimateQuest';
 
   @override
   Widget text(String text,
@@ -175,12 +175,12 @@ class FlutterTools extends UiTools<Widget, Color, EdgeInsets> {
           child: ctx.ui.container()),
 
       // Show guide
-      if (ctx.component.data['guide'] is double)
+      if (ctx.component.data.has('guide'))
         ctx.ui.positioned(
-            left: ctx.bleed + ctx.component.data['guide'],
-            right: ctx.bleed + ctx.component.data['guide'],
-            top: ctx.bleed + ctx.component.data['guide'],
-            bottom: ctx.bleed + ctx.component.data['guide'],
+            left: ctx.bleed + ctx.component.data.valueAsDouble('guide')!,
+            right: ctx.bleed + ctx.component.data.valueAsDouble('guide')!,
+            top: ctx.bleed + ctx.component.data.valueAsDouble('guide')!,
+            bottom: ctx.bleed + ctx.component.data.valueAsDouble('guide')!,
             showDebug: false,
             child: ctx.ui.container()),
 
